@@ -3,19 +3,19 @@
         {
             "name": "Project",
             "includePath": [
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\Libraries\\STM32F4xx_StdPeriph_Driver\\inc",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\Libraries\\STM32F4xx_StdPeriph_Driver\\src",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\Libraries\\CMSIS\\Include",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\Libraries\\CMSIS\\Device\\ST\\STM32F4xx\\Include",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\FreeRTOSV7.3.0\\FreeRTOS\\Source\\include",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\FreeRTOSV7.3.0\\FreeRTOS\\Source\\portable\\MemMang",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\FreeRTOSV7.3.0\\FreeRTOS\\Source\\portable\\RVDS\\ARM_CM4F",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\MDK-ARM",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\Libraries\\STM32F4xx_StdPeriph_Driver\\inc",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\Libraries\\STM32F4xx_StdPeriph_Driver\\src",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\Libraries\\CMSIS\\Include",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\Libraries\\CMSIS\\Device\\ST\\STM32F4xx\\Include",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\FreeRTOSV7.3.0\\FreeRTOS\\Source\\include",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\FreeRTOSV7.3.0\\FreeRTOS\\Source\\portable\\MemMang",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\FreeRTOSV7.3.0\\FreeRTOS\\Source\\portable\\RVDS\\ARM_CM4F",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\MDK-ARM",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include\\rw",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\Libraries\\CMSIS\\Device\\ST\\STM32F4xx\\Source\\Templates\\arm",
-                "c:\\Users\\ADMIN\\Desktop\\robocon\\robo\\robocon\\ROBOT_MR1\\FreeRTOSV7.3.0\\FreeRTOS\\Source"
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\Libraries\\CMSIS\\Device\\ST\\STM32F4xx\\Source\\Templates\\arm",
+                "c:\\Users\\sonng\\rbc2024\\ROBOT_MR1\\FreeRTOSV7.3.0\\FreeRTOS\\Source"
             ],
             "defines": [
                 "STM32F4XX",

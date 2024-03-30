@@ -218,6 +218,9 @@ static void taskDieuKhienCoCau(void *pvParameters)
 		//		Giu_Truc_Y();
 		//		Giu_Truc_X();
 		//		Giu_Mam_Xoay();
+		giu_Tay_X();
+		giu_Tay_Y();
+		giuBase();
 		vTaskDelay(5);
 	}
 }
@@ -230,13 +233,20 @@ static void taskRobotAnalytics(void *pvParameters)
 	}
 }
 static void taskMain(void *pvParameters)
-{
+{	
 	Config_Robot();
+	initArm();
+	initBase();
 	// xTaskCreate(taskBase, (signed char *)"taskBase", 256, NULL, 0, NULL);
-	xTaskCreate(taskArm, (signed char *)"taskArm", 256, NULL, 0, NULL);
-
+	//xTaskCreate(taskArm, (signed char *)"taskArm", 256, NULL, 0, NULL);
+	resetArmYToReady();
+	resetArmXToReady();
+	xTaskCreate(taskDieuKhienCoCau, (signed char *)"taskDieuKhienCoCau", 256, NULL, 0, NULL);
 	while (1)
 	{
+		moveYByActualLength(200);
+		moveXByActualLength(200);
+		moveBaseByAngle(30);
 		vTaskDelay(5);
 		if (!Nut_1)
 		{

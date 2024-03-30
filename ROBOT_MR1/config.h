@@ -92,7 +92,7 @@ vu8 DATA_SPEED[60] = {
 
 //----- encoder canh tay ------
 #define Encoder_Arm_X (vs32)((num_over_t5 << 16) | TIM_GetCounter(TIM5)) / 100
-#define Encoder_Arm_Y (vs32)((num_over_t3 << 16) | TIM_GetCounter(TIM3))
+#define Encoder_Arm_Y (vs32)((num_over_t3 << 16) | TIM_GetCounter(TIM3))/10
 
 //----- cam bien tu-----
 #define Cam_Bien_Tu_Arm_Y_Top GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_7)

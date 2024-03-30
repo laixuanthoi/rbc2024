@@ -55,31 +55,31 @@ void initArm()
 {
     // Arm X
     armX.minEncoders = -7000; // 7000 hz
-    armX.maxEncoders = 0;
+    armX.maxEncoders = -700;
     armX.minMilimets = 0; // 50 cm
-    armX.maxMilimets = 500;
+    armX.maxMilimets = 450;
 
     armX.minMotorSpeed = 2;
-    armX.maxMotorSpeed = 200;
+    armX.maxMotorSpeed = 50;
 
     armX.currentEncoders = 0;
     armX.currentMotorSpeed = armX.minMotorSpeed;
     armX.currentMotorDirection = 0;
 
-    armX.targetEncoders = (armX.minEncoders + armX.maxEncoders) / 2;
+    armX.targetEncoders = armX.maxEncoders;
     armX.targetMotorSpeed = armX.minMotorSpeed;
 
     armX.isRunning = 0;
     armX.isReady = 0;
 
     // Arm Y
-    armY.minEncoders = 0;
-    armY.maxEncoders = 3000;
+    armY.minEncoders = -10;
+    armY.maxEncoders = -1200;
     armY.minMilimets = 0;
-    armY.maxMilimets = 370; // 37cm
+    armY.maxMilimets = 420; // 37cm
 
     armY.minMotorSpeed = 2;
-    armY.maxMotorSpeed = 40;
+    armY.maxMotorSpeed = 50;
 
     armY.currentEncoders = 0;
     armY.currentMotorSpeed = armY.minMotorSpeed;
@@ -94,153 +94,118 @@ void initArm()
 
 bool isEqualEncoders(int encoderA, int encoderB)
 {
-    return abs(encoderA - encoderB) < 30;
+    return abs(encoderA - encoderB) < 20;
 }
 
-void updateArm()
-{
-    armX.currentEncoders = getEncoderArmX();
-    armX.currentMotorDirection = Motor_Arm_X_Direct;
-    armX.currentMotorSpeed = Motor_Arm_X_Speed;
-    armX.isRunning = armX.currentMotorSpeed > armX.minMotorSpeed ? 1 : 0;
+// void updateArm()
+// {
+//     armX.currentEncoders = getEncoderArmX();
+//     armX.currentMotorDirection = Motor_Arm_X_Direct;
+//     armX.currentMotorSpeed = Motor_Arm_X_Speed;
+//     armX.isRunning = armX.currentMotorSpeed > armX.minMotorSpeed ? 1 : 0;
 
-    armY.currentEncoders = getEncoderArmY();
-    armY.currentMotorDirection = Motor_Arm_Y_Direct;
-    armY.currentMotorSpeed = Motor_Arm_Y_Speed;
-    armY.isRunning = armY.currentMotorSpeed > armY.minMotorSpeed ? 1 : 0;
-}
+//     armY.currentEncoders = getEncoderArmY();
+//     armY.currentMotorDirection = Motor_Arm_Y_Direct;
+//     armY.currentMotorSpeed = Motor_Arm_Y_Speed;
+//     armY.isRunning = armY.currentMotorSpeed > armY.minMotorSpeed ? 1 : 0;
+// }
 
 void resetArmXToReady()
 {
-    while (Cam_Bien_Tu_Arm_X_In)
-    {
-        Motor_Arm_X_Speed = 150;
-        Motor_Arm_X_Direct_In;
-        vTaskDelay(5);
-    }
 
-    // reset Encoder
+    Motor_Arm_X_Speed = armX.maxMotorSpeed;
+    Motor_Arm_X_Direct_In;
+		//check cham cam bien tu
+    for (i = 0; i < 50; i++)while (Cam_Bien_Tu_Arm_X_In) {vTaskDelay(1);}
+    
+    //dung lai va set motor dung yen , reset encoder x
+    Motor_Arm_X_Speed = armX.minMotorSpeed;
     TIM5->CNT = 0;
     num_over_t5 = 0;
-
-    while (getEncoderArmX() > -2000)
-    {
-        Motor_Arm_X_Speed = 150;
-        Motor_Arm_X_Direct_Out;
-        vTaskDelay(5);
-    }
-
-    Motor_Arm_X_Speed = 2;
-    armX.isReady = 1;
+	vTaskDelay(5);
+		
+	//cho motor chay ra vi tri min
+	Motor_Arm_X_Speed =  armX.maxMotorSpeed;
+    Motor_Arm_X_Direct_Out;
+	for (i = 0; i < 50; i++) while (getEncoderArmX() > armX.maxEncoders)  {vTaskDelay(1);}
+	Motor_Arm_X_Speed = armX.minMotorSpeed;
 }
 
-void setMotorArmX()
-{
-    armX.targetEncoders = map_MinMax(armX.targetEncoders, armX.minEncoders, armX.maxEncoders);
-    armX.targetMotorSpeed = map_MinMax(armX.targetMotorSpeed, armX.minMotorSpeed, armX.maxMotorSpeed);
-    if (!isEqualEncoders(armX.currentEncoders, armX.targetEncoders))
-    {
-        if (armX.targetEncoders > armX.currentEncoders) // in
-        {
-            Motor_Arm_X_Direct_In;
-            if (Cam_Bien_Tu_Arm_X_In)
-            {
-                Motor_Arm_X_Speed = armX.minMotorSpeed;
-            }
-            else
-            {
-                Motor_Arm_X_Speed = armX.targetMotorSpeed;
-            }
-        }
-        else // out
-        {
-            Motor_Arm_X_Direct_Out;
-            Motor_Arm_X_Speed = armX.targetMotorSpeed;
-        }
-    }
-    else // reach to target
-    {
-        Motor_Arm_X_Speed = armX.minMotorSpeed;
-    }
+int convertXMilimetsToEnoders(int milimets){
+	//conver mm to encoder
+	return (int)milimets*armX.minEncoders/armX.maxMilimets;
 }
 
-void moveArmXToEncoders(int targetEncoders, int targetSpeed)
-{
-    armX.targetEncoders = targetEncoders;
-    armX.targetMotorSpeed = targetSpeed;
+
+void giu_Tay_X(void){
+    int temp = 0;
+	//func loop giu tay X task dieu khien 
+    temp = getEncoderArmX();
+	if (!isEqualEncoders(armX.targetEncoders,temp)){
+		//do lech giua encoder taget > encoder der hien tai lon hon sai so
+		if(armX.targetEncoders > temp) Motor_Arm_X_Direct_In ;
+		else Motor_Arm_X_Direct_Out;
+		Motor_Arm_X_Speed = armX.maxMotorSpeed;
+		
+	}
+	else Motor_Arm_X_Speed = armX.minMotorSpeed;
 }
 
-void moveArmXToMilimets(int targetMilimets, int targetSpeed)
-{
-    armX.targetEncoders = map_int(targetMilimets, armX.minMilimets, armX.maxMilimets, armX.minEncoders, armX.maxEncoders);
-    armX.targetMotorSpeed = targetSpeed;
+
+void moveXByActualLength(int length){
+    int temp = 0;
+	temp = convertXMilimetsToEnoders(length);
+	armX.targetEncoders = temp;
+}
+
+
+
+void reset_Encoder_Canh_Tay_Y(){
+    TIM3->CNT = 0;
+    num_over_t3 = 0;
+
+}
+
+int convertYMilimetsToEnoders(int milimets){
+	//conver mm to encoder
+	return (int)milimets*armY.minEncoders/armY.maxMilimets;
+}
+
+void giu_Tay_Y(void){
+    int temp = 0;
+	//func loop giu tay X task dieu khien 
+    temp = getEncoderArmY();
+	if (!isEqualEncoders(armY.targetEncoders,temp)){
+		//do lech giua encoder taget > encoder der hien tai lon hon sai so
+		if(armY.targetEncoders > temp) Motor_Arm_Y_Direct_Down ;
+		else Motor_Arm_Y_Direct_Up;
+		Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+		
+	}
+	else Motor_Arm_Y_Speed = armY.minMotorSpeed;
+}
+void moveYByActualLength(int length){
+    int temp = 0;
+	temp = convertYMilimetsToEnoders(length);
+	armY.targetEncoders = temp;
 }
 
 // ===== ARM Y =====
 void resetArmYToReady()
 {
-    while (Cam_Bien_Tu_Arm_Y_Top)
-    {
-        vTaskDelay(5);
-        Motor_Arm_Y_Speed = 50;
-        Motor_Arm_Y_Direct_Up;
-    }
-
-    Motor_Arm_Y_Speed = 2;
-
-    // reset Encoder
-    TIM3->CNT = 0;
-    num_over_t3 = 0;
-    vTaskDelay(5);
-
-    while (getEncoderArmY() < 500)
-    {
-        vTaskDelay(5);
-        Motor_Arm_Y_Speed = 50;
-        Motor_Arm_Y_Direct_Down;
-    }
-
-    Motor_Arm_Y_Speed = 2;
-    armY.isReady = 1;
+    Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    Motor_Arm_Y_Direct_Down;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Bottom){vTaskDelay(1);}
+	Motor_Arm_Y_Speed = armY.minMotorSpeed;
+    reset_Encoder_Canh_Tay_Y();
+	Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    Motor_Arm_Y_Direct_Up;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Top){vTaskDelay(1);}
+    Motor_Arm_Y_Speed = armY.minMotorSpeed;
 }
 
-void setMotorArmY()
-{
-    armY.targetEncoders = map_MinMax(armY.targetEncoders, armY.minEncoders, armY.maxEncoders);
-    armY.targetMotorSpeed = map_MinMax(armY.targetMotorSpeed, armY.minMotorSpeed, armY.maxMotorSpeed);
 
-    if (!isEqualEncoders(armY.currentEncoders, armY.targetEncoders))
-    {
-        if (armY.targetEncoders > armY.currentEncoders) // down
-        {
-            Motor_Arm_Y_Direct_Down;
-            if (Cam_Bien_Tu_Arm_Y_Bottom)
-            {
-                Motor_Arm_Y_Speed = armY.minMotorSpeed;
-            }
-            else
-            {
-                Motor_Arm_Y_Speed = armY.targetMotorSpeed;
-            }
-        }
-        else
-        {
-            Motor_Arm_Y_Direct_Up;
-            if (Cam_Bien_Tu_Arm_Y_Top)
-            {
-                Motor_Arm_Y_Speed = armY.minMotorSpeed;
-            }
-            else
-            {
-                Motor_Arm_Y_Speed = armY.targetMotorSpeed;
-            }
-        }
-    }
-    else // reach to target
-    {
-        Motor_Arm_Y_Speed = armY.minMotorSpeed;
-    }
-}
+
 
 void moveArmYToEncoders(int targetEncoders, int targetSpeed)
 {
