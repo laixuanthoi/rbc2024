@@ -83,7 +83,7 @@ void HMI_TRAN(vs32 _so_dong)
 		break;
 	case 12:
 		// HMI_DMI("T BT MAM XOAY:", Target_Bien_Tro_Mam_Xoay, 12);
-		HMI_DMI("CBT Y Top:", Cam_Bien_Tu_Arm_Y_Top, 12);
+		HMI_DMI("Motor_Hut: ", Motor_Hut, 12);
 		break;
 	case 13:
 		HMI_DMI("CBT Y Bottom:", armX.isReady, 13);
@@ -185,6 +185,7 @@ void Config_Robot(void)
 
 	Config_encoder_timer2_timer3();
 	Config_encoder_timer1();
+	Config_pwm_time_t4();
 
 	Config_ADC1_DMA();
 
@@ -219,9 +220,18 @@ static void taskDieuKhienCoCau(void *pvParameters)
 		//		Giu_Truc_Y();
 		//		Giu_Truc_X();
 		//		Giu_Mam_Xoay();
-		giu_Tay_X();
+		//giu_Tay_X();
+		//giuBase();
+		giuMotorGripper();
+		vTaskDelay(5);
+	}
+}
+static void taskDieuKhienCoCauY(void *pvParameters)
+{
+	while (1)
+	{
+		// ADCValue_Control();
 		giu_Tay_Y();
-		giuBase();
 		vTaskDelay(5);
 	}
 }
@@ -240,20 +250,22 @@ static void taskMain(void *pvParameters)
 	initBase();
 	// xTaskCreate(taskBase, (signed char *)"taskBase", 256, NULL, 0, NULL);
 	//xTaskCreate(taskArm, (signed char *)"taskArm", 256, NULL, 0, NULL);
-	resetArmYToReady();
-	resetArmXToReady();
+	//resetArmYToReady();
+	//resetArmXToReady();
+	//xTaskCreate(taskDieuKhienCoCauY, (signed char *)"taskDieuKhienCoCauY", 256, NULL, 0, NULL);
 	xTaskCreate(taskDieuKhienCoCau, (signed char *)"taskDieuKhienCoCau", 256, NULL, 0, NULL);
 	while (1)
 	{
-		moveYByActualLength(200);
-		moveXByActualLength(200);
-		moveBaseByAngle(30);
-		vTaskDelay(5);
+		
+		//moveArmToXY(-300,300);
 		if (!Nut_1)
 		{
+			gripperGetBall();
+			vTaskDelay(2000);
 			// moveArmXToEncoders(-3000, 150);
 			// moveArmYToEncoders(1500, 150);
 		}
+
 	}
 }
 int main(void)

@@ -37,11 +37,11 @@ int getBienTroBase()
 void initBase()
 {
     base.minBienTro = 3; // set bien tro range
-    base.maxBienTro = 900;
+    base.maxBienTro = 885;
     base.oneAngleToBienTro = 10/3; // 600 bt la goc 90* 900 bt la goc 0 do => 300 bt = 90* => 1 do = 300/90 = 10/3
 
     base.minMotorSpeed = 2; // set motor speed range
-    base.maxMotorSpeed = 50;
+    base.maxMotorSpeed = 30;
 
     base.currentBienTro = (int)((base.minBienTro + base.maxBienTro) / 2);
     base.currentMotorSpeed = base.minMotorSpeed;
@@ -56,7 +56,7 @@ void initBase()
 
 bool isEqualBienTro(int bientroA, int bientroB)
 {
-    return abs(bientroA - bientroB) < 5;
+    return abs(bientroA - bientroB) < 10;
 }
 
 void giuBase()
@@ -84,6 +84,8 @@ int calculateBienTroBase(float angle)
 
 void moveBaseByAngle(float angle){
     //func di chyen mam xoay by angle
+    if(angle < 0) angle = 0;
+    if(angle > 270) angle = 270;
     base.targetBienTro = calculateBienTroBase(angle);
 }
 

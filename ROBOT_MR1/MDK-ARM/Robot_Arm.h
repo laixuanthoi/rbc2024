@@ -1,4 +1,22 @@
 #define PI 3.14159265358979323846
+
+struct Gripper{
+    int minMotorHut;
+    int maxMotorHut;
+    int motorHutGetBall;
+
+    int minMotorSpeed;
+    int maxMotorSpeed;
+
+    int minBienTro;
+    int maxBienTro;
+    int bienTroDropBall;
+    
+    int tagetBienTro;
+
+};
+struct Gripper gripper;
+
 struct ArmProperties
 {
     int minEncoders;
@@ -22,6 +40,7 @@ struct ArmProperties
 
 struct ArmProperties armX;
 struct ArmProperties armY;
+
 
 
 int getEncoderArmX()
@@ -61,7 +80,7 @@ void initArm()
     armX.maxMilimets = 450;
 
     armX.minMotorSpeed = 2;
-    armX.maxMotorSpeed = 50;
+    armX.maxMotorSpeed = 250;
 
     armX.currentEncoders = 0;
     armX.currentMotorSpeed = armX.minMotorSpeed;
@@ -74,23 +93,39 @@ void initArm()
     armX.isReady = 0;
 
     // Arm Y
-    armY.minEncoders = -10;
-    armY.maxEncoders = -1200;
+    armY.minEncoders = 10;
+    armY.maxEncoders = 1160;
     armY.minMilimets = 0;
     armY.maxMilimets = 420; // 37cm
 
     armY.minMotorSpeed = 2;
-    armY.maxMotorSpeed = 50;
+    armY.maxMotorSpeed = 40;
 
     armY.currentEncoders = 0;
     armY.currentMotorSpeed = armY.minMotorSpeed;
     armY.currentMotorDirection = 0;
 
-    armY.targetEncoders = (armY.minEncoders + armY.maxEncoders) / 2;
+    armY.targetEncoders = armY.minEncoders;
     armY.targetMotorSpeed = armX.minMotorSpeed;
 
     armY.isRunning = 0;
     armY.isReady = 0;
+
+    //gripper
+    gripper.minMotorHut = 400;
+    gripper.maxMotorHut = 1200;
+    gripper.motorHutGetBall = 950;
+
+    gripper.minMotorSpeed = 2;
+    gripper.maxMotorSpeed = 100;
+
+    gripper.minBienTro = 330;
+    gripper.maxBienTro = 800;
+    gripper.bienTroDropBall = 450;
+    gripper.tagetBienTro = gripper.minBienTro;
+
+    Motor_Hut = gripper.minMotorHut;
+
 }
 
 bool isEqualEncoders(int encoderA, int encoderB)
@@ -143,6 +178,8 @@ void giu_Tay_X(void){
 void moveXByActualLength(int length){
     int temp = 0;
 	temp = convertXMilimetsToEnoders(length);
+    if(temp < armX.minEncoders) temp = armX.minEncoders;
+    if(temp > armX.maxEncoders) temp = armX.maxEncoders; 
 	armX.targetEncoders = temp;
 }
 
@@ -156,7 +193,7 @@ void reset_Encoder_Canh_Tay_Y(){
 
 int convertYMilimetsToEnoders(int milimets){
 	//conver mm to encoder
-	return (int)milimets*armY.minEncoders/armY.maxMilimets;
+	return (int)milimets*armY.maxEncoders/armY.maxMilimets;
 }
 
 void giu_Tay_Y(void){
@@ -181,14 +218,10 @@ void moveYByActualLength(int length){
 // ===== ARM Y =====
 void resetArmYToReady()
 {
-    Motor_Arm_Y_Speed = armY.maxMotorSpeed;
-    Motor_Arm_Y_Direct_Down;
-    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Bottom){vTaskDelay(1);}
-	Motor_Arm_Y_Speed = armY.minMotorSpeed;
-    reset_Encoder_Canh_Tay_Y();
 	Motor_Arm_Y_Speed = armY.maxMotorSpeed;
     Motor_Arm_Y_Direct_Up;
     for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Top){vTaskDelay(1);}
+    reset_Encoder_Canh_Tay_Y();
     Motor_Arm_Y_Speed = armY.minMotorSpeed;
 }
 
@@ -207,36 +240,81 @@ void moveArmToXY(int x,int y){
 
 
 
+//gripper
 
-void moveArmYToEncoders(int targetEncoders, int targetSpeed)
-{
-    armY.targetEncoders = targetEncoders;
-    armY.targetMotorSpeed = targetSpeed;
+bool isEqualBienTroGripper(int bt_a,int bt_b){
+    return abs(bt_a - bt_b) < 25;
 }
 
-void moveArmYToMilimets(int targetMilimets, int targetSpeed)
+int getBienTroGripper()
 {
-    armY.targetEncoders = map_int(targetMilimets, armY.minMilimets, armY.maxMilimets, armY.minEncoders, armY.maxEncoders);
-    armY.targetMotorSpeed = targetSpeed;
-}
-
-static void taskArm(void *p)
-{
-    initArm();
-    resetArmYToReady();
-    while (1)
+    int en, enOld = Bien_Tro_Gripper;
+    u16 i = 0;
+    while (i < 2)
     {
-        vTaskDelay(5);
-        // updateArm();
-        // if (!armY.isReady || !armX.isReady)
-        // {
-        //     resetArmYToReady();
-        //     resetArmXToReady();
-        // }
-        // else
-        // {
-        //     setMotorArmX();
-        //     setMotorArmY();
-        // }
+        en = Bien_Tro_Gripper;
+        if (abs(en - enOld) < 50)
+            i++;
+        enOld = en;
     }
+    return abs(en);
+}
+
+void giuMotorGripper(){
+    int temp = 0;
+    temp = getBienTroGripper();
+    //dua motor xuong duoi goc 0 do
+    if(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){
+        if(gripper.tagetBienTro > temp ) Motor_Gripper_Direct_Up;
+        else Motor_Gripper_Direct_Down;
+        Motor_Gripper_Speed = gripper.maxMotorSpeed;
+    }
+    else Motor_Gripper_Speed = gripper.minMotorSpeed;
+}
+
+void gripperGetBall(){
+    int temp = 0;
+    temp = getBienTroGripper();
+
+    Motor_Hut = gripper.maxMotorHut;
+
+    gripper.tagetBienTro = gripper.minBienTro;
+    vTaskDelay(5);
+    for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){temp = getBienTroGripper();vTaskDelay(1);}
+
+    // Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    // Motor_Arm_Y_Direct_Down;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Bottom){vTaskDelay(1);}
+    // Motor_Arm_Y_Speed = armY.minMotorSpeed;
+    // Xi_Lanh_Gripper_On;
+    vTaskDelay(4000);
+
+    temp = getBienTroGripper();
+    gripper.tagetBienTro = gripper.maxBienTro;
+
+    vTaskDelay(5);
+    for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){temp = getBienTroGripper();vTaskDelay(1);}
+
+    Xi_Lanh_Gripper_On;
+    vTaskDelay(4000);
+    Motor_Hut = gripper.motorHutGetBall;
+    // Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    // Motor_Arm_Y_Direct_Up;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Top){vTaskDelay(1);}
+    // Motor_Arm_Y_Speed = armY.minMotorSpeed;
+}
+
+void gripperDropBall(){
+    int temp = 0;
+    temp = getBienTroGripper();
+
+    Motor_Hut = gripper.maxMotorHut;
+    gripper.tagetBienTro = gripper.bienTroDropBall;
+    vTaskDelay(5);
+
+    for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){temp = getBienTroGripper();vTaskDelay(1);}
+    Motor_Hut = gripper.minMotorHut;
+    Xi_Lanh_Gripper_On;
+    vTaskDelay(500);
+
 }
