@@ -1,4 +1,4 @@
-
+#define PI 3.14159265358979323846
 struct ArmProperties
 {
     int minEncoders;
@@ -22,6 +22,7 @@ struct ArmProperties
 
 struct ArmProperties armX;
 struct ArmProperties armY;
+
 
 int getEncoderArmX()
 {
@@ -96,19 +97,6 @@ bool isEqualEncoders(int encoderA, int encoderB)
 {
     return abs(encoderA - encoderB) < 20;
 }
-
-// void updateArm()
-// {
-//     armX.currentEncoders = getEncoderArmX();
-//     armX.currentMotorDirection = Motor_Arm_X_Direct;
-//     armX.currentMotorSpeed = Motor_Arm_X_Speed;
-//     armX.isRunning = armX.currentMotorSpeed > armX.minMotorSpeed ? 1 : 0;
-
-//     armY.currentEncoders = getEncoderArmY();
-//     armY.currentMotorDirection = Motor_Arm_Y_Direct;
-//     armY.currentMotorSpeed = Motor_Arm_Y_Speed;
-//     armY.isRunning = armY.currentMotorSpeed > armY.minMotorSpeed ? 1 : 0;
-// }
 
 void resetArmXToReady()
 {
@@ -202,6 +190,19 @@ void resetArmYToReady()
     Motor_Arm_Y_Direct_Up;
     for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Top){vTaskDelay(1);}
     Motor_Arm_Y_Speed = armY.minMotorSpeed;
+}
+
+void cartesianToPolar(int x, int y,float *r,float *theta) {
+    *r = sqrt(x * x + y * y);
+    *theta = atan2(y, x)*(180.0/PI);
+}
+
+
+void moveArmToXY(int x,int y){
+    float r,theta;
+    cartesianToPolar(x,y,&r,&theta);
+    moveXByActualLength(r);
+    moveBaseByAngle(theta);
 }
 
 
