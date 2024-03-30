@@ -1,0 +1,20 @@
+{
+    "files.associations": {
+        "stm32f4xx_rcc.h": "c",
+        "lcd.h": "c",
+        "math.h": "c",
+        "config.h": "c",
+        "stm32f4xx_gpio.h": "c",
+        "stdlib.h": "c",
+        "ban_tay.h": "c",
+        "stdio.h": "c",
+        "canh_tay.h": "c",
+        "doc_tay_game.h": "c",
+        "mam_xoay.h": "c",
+        "stm32f4xx.h": "c",
+        "utils.h": "c",
+        "robot_arm.h": "c",
+        "4omnicontroler.h": "c",
+        "freertos.h": "c"
+    }
+}
