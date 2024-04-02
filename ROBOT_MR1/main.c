@@ -14,11 +14,14 @@
 
 #include "doc_tay_game.h"
 #include "4OmniControler.h"
+#include "BasicFunction.h"
+#include "uart_comunicate.h"
 
 // #include "Ban_Tay.h"
 // #include "Canh_Tay.h"
-#include "Robot_Arm.h"
 #include "Robot_Base.h"
+#include "Robot_Arm.h"
+
 // #include "Motor_Hut.h"
 // #include "Mam_Xoay.h"
 
@@ -51,22 +54,23 @@ void HMI_TRAN(vs32 _so_dong)
 		HMI_DMI("IMU:", _robotIMUAngle, 1);
 		break;
 	case 2:
-		HMI_DMI("LAZER FRONT:", Lazer_Front, 2);
+		HMI_DMI("LAZER FRONT:", lazerTruocValue, 2);
 		break;
 	case 3:
-		HMI_DMI("LAZER LEFT:", Lazer_Left, 3);
+		HMI_DMI("LAZER LEFT:", lazerTraiValue, 3);
 		break;
 	case 4:
-		HMI_DMI("LAZER RIGHT:", Lazer_Right, 4);
+		HMI_DMI("LAZER RIGHT:", lazerPhaiValue, 4);
 		break;
 	case 5:
-		HMI_DMI("EN WH LEFT:", Encoder_Wheel_Rear_Left, 5);
+		HMI_DMI("EN WH LEFT:", getEncoderRearLeft(), 5);
 		break;
 	case 6:
-		HMI_DMI("EN WH RIGHT:", Encoder_Wheel_Rear_Right, 6);
+		HMI_DMI("EN WH RIGHT:", getEncoderRearRight(), 6);
 		break;
 	case 7:
-		HMI_DMI("EN 3 WHS:", Encoder_Wheel_Rear_Left + Encoder_Wheel_Rear_Right, 7);
+		HMI_DMI("EN 3 WHS:", getEncoderTong(), 7);
+		break;
 
 	case 8:
 		HMI_DMI("EN ARM X:", Encoder_Arm_X, 8);
@@ -82,14 +86,14 @@ void HMI_TRAN(vs32 _so_dong)
 		break;
 	case 12:
 		// HMI_DMI("T BT MAM XOAY:", Target_Bien_Tro_Mam_Xoay, 12);
-		HMI_DMI("CBT Y Top:", Cam_Bien_Tu_Arm_Y_Top, 12);
+		HMI_DMI("Motor y: ", Motor_Arm_Y_Speed, 12);
 		break;
 	case 13:
-		HMI_DMI("CBT Y Bottom:", armX.isReady, 13);
+		HMI_DMI("Y:", Y_Thoi, 13);
 		// HMI_DMI("T BT BAN TAY:", Target_Bien_Tro_Ban_Tay, 13);
 		break;
 	case 14:
-		HMI_DMI("CBT X In:", Nut_3, 14);
+		HMI_DMI("X:", X_Thoi, 14);
 		// HMI_DMI("TIME:", time_now, 14);
 		break;
 	case 15:
@@ -184,6 +188,7 @@ void Config_Robot(void)
 
 	Config_encoder_timer2_timer3();
 	Config_encoder_timer1();
+	Config_pwm_time_t4();
 
 	Config_ADC1_DMA();
 
@@ -213,11 +218,35 @@ static void taskDieuKhienCoCau(void *pvParameters)
 {
 	while (1)
 	{
-		// ADCValue_Control();
+		//ADCValue_Control();
 		//		Giu_Tay_Nang_Bong();
 		//		Giu_Truc_Y();
 		//		Giu_Truc_X();
 		//		Giu_Mam_Xoay();
+		giu_Tay_X();
+		giuBase();
+		giuMotorGripper();
+		vTaskDelay(10);
+	}
+}
+static void taskGiaoTiepRas(void *pvParameters)
+{
+	while (1)
+	{
+		
+		//USART_SendSTRING();
+		getXYFromXuanThoi();
+		vTaskDelay(15);
+	}
+}
+
+static void taskChongNhieu(void *pvParameters)
+{
+	while (1)
+	{
+		// ADCValue_Control();
+		chongNhieuADCValue();
+		getXYFromXuanThoi();
 		vTaskDelay(5);
 	}
 }
@@ -230,25 +259,50 @@ static void taskRobotAnalytics(void *pvParameters)
 	}
 }
 static void taskMain(void *pvParameters)
-{
+{	
 	Config_Robot();
+	initArm();
+	initBase();
 	// xTaskCreate(taskBase, (signed char *)"taskBase", 256, NULL, 0, NULL);
-	xTaskCreate(taskArm, (signed char *)"taskArm", 256, NULL, 0, NULL);
-
+	//xTaskCreate(taskArm, (signed char *)"taskArm", 256, NULL, 0, NULL);
+	
+	xTaskCreate(taskChongNhieu, (signed char *)"taskChongNhieu", 256, NULL, 0, NULL);
+	xTaskCreate(taskRobotAnalytics, (signed char*)"taskRobotAnalytics", 256, NULL, 0, NULL);
+	USART_SendSTRING();
+	robotResetIMU();
+	resetArmYToReady();
+	resetArmGripperToReady();
+	resetArmXToReady();
+	RESET_ENCODER_WH();
+	xTaskCreate(taskDieuKhienCoCau, (signed char *)"taskDieuKhienCoCau", 256, NULL, 0, NULL);
+	//xTaskCreate(taskGiaoTiepRas, (signed char *)"taskGiaoTiepRas", 256, NULL, 0, NULL);
+	
 	while (1)
 	{
-		vTaskDelay(5);
+		
 		if (!Nut_1)
 		{
+
+			
+			test_gap_bong();
+			// robotRun(0,10);
+			// for(i=0;i<50;i++) while (getEncoderTong() < 1000)
+			// {
+			// 	vTaskDelay(1);
+			// }
+			
+			//vTaskDelay(2000);
 			// moveArmXToEncoders(-3000, 150);
 			// moveArmYToEncoders(1500, 150);
+			vTaskDelay(5);
 		}
+
 	}
 }
 int main(void)
 {
 	xTaskCreate(taskMain, (signed char *)"taskMain", 256, NULL, 0, NULL);
 	xTaskCreate(taskLCD, (signed char *)"taskLCD", 256, NULL, 0, NULL);
-
+	
 	vTaskStartScheduler();
 }

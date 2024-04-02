@@ -1,4 +1,99 @@
+#include "4OmniControler.h"
+void startSanDo(){
+    RESET_ENCODER_WH();
+    robotRunAngle(-900,70,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 3800){vTaskDelay(1);}
+    robotRunAngle(-900,50,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 4200){vTaskDelay(1);}
+    robotStop(0);
+}
 
+void startSanXanh(){
+    RESET_ENCODER_WH();
+    robotRunAngle(900,70,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 3800){vTaskDelay(1);}
+    robotRunAngle(900,50,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 4200){vTaskDelay(1);}
+    robotRunAngle(900,40,0,0.2);
+    for(i=0;i<50;i++) while (lazerPhaiValue > 50){vTaskDelay(1);}
+    RESET_ENCODER_WH();
+    robotRunAngle(0,70,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 2500){vTaskDelay(1);}
+    robotRunAngle(0,40,0,0.2);
+    for(i=0;i<50;i++) while (lazerPhaiValue < 45){vTaskDelay(1);}
+    RESET_ENCODER_WH();
+    for(i=0;i<50;i++) while (getEncoderTong() < 300){vTaskDelay(1);}
+    robotRunAngle(900,50,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 2200){vTaskDelay(1);}
+    for(i=0;i<50;i++) while(lazerPhaiValue > 180){
+        if(lazerTruocValue > 113) robotRunAngle(850,20,0,0.3);
+        else if(lazerTruocValue < 113) robotRunAngle(950,20,0,0.3);
+        else robotRunAngle(900,20,0,0.3);
+    }
+
+    robotStop(0);
+}
+
+
+void startSanDo(){
+    RESET_ENCODER_WH();
+    robotRunAngle(-900,70,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 3800){vTaskDelay(1);}
+    robotRunAngle(-900,50,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 4200){vTaskDelay(1);}
+    robotRunAngle(-900,40,0,0.2);
+    for(i=0;i<50;i++) while (lazerTraiValue > 50){vTaskDelay(1);}
+    RESET_ENCODER_WH();
+    robotRunAngle(0,70,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 2500){vTaskDelay(1);}
+    robotRunAngle(0,40,0,0.2);
+    for(i=0;i<50;i++) while (lazerTraiValue < 45){vTaskDelay(1);}
+    RESET_ENCODER_WH();
+    for(i=0;i<50;i++) while (getEncoderTong() < 300){vTaskDelay(1);}
+    robotRunAngle(-900,50,0,0.2);
+    for(i=0;i<50;i++) while (getEncoderTong() < 2200){vTaskDelay(1);}
+    for(i=0;i<50;i++) while(lazerTraiValue > 180){
+        if(lazerTruocValue > 113) robotRunAngle(-850,20,0,0.3);
+        else if(lazerTruocValue < 113) robotRunAngle(-950,20,0,0.3);
+        else robotRunAngle(-900,20,0,0.3);
+    }
+
+    robotStop(0);
+}
+
+void runToBallsRed(){
+    RESET_ENCODER_WH();
+    robotRunAngle(1800,50,0,0.3);
+    for(i=0;i<50;i++) while (getEncoderTong() < 3400){
+        if(lazerTraiValue > 170) robotRunAngle(1850,50,0,0.3);
+        else if (lazerTraiValue < 170) robotRunAngle(1750,50,0,0.3);
+        else robotRunAngle(1800,50,0,0.3);
+        vTaskDelay(1);}
+    robotStop(0);
+    //gripperGetBallByXY(0,300);
+
+
+}
+
+void runToSiloesRed(){
+    RESET_ENCODER_WH();
+    robotRunAngle(0,50,0,0.3);
+    for(i=0;i<50;i++) while (getEncoderTong() < 1000){
+        if(lazerTraiValue > 170) robotRunAngle(-50,50,0,0.3);
+        else if (lazerTraiValue < 170) robotRunAngle(50,50,0,0.3);
+        else robotRunAngle(0,50,0,0.3);
+        vTaskDelay(1);}
+    for(i=0;i<50;i++) while (lazerTruocValue > 113){
+        if(lazerTraiValue > 170) robotRunAngle(-50,50,0,0.3);
+        else if (lazerTraiValue < 170) robotRunAngle(50,50,0,0.3);
+        else robotRunAngle(0,50,0,0.3);
+        vTaskDelay(1);
+    }    
+    robotStop(0);
+    //gripperGetBallByXY(0,300);
+
+
+}
 
 // //===================================SHAGAI 2 DO======================================//
 // void Retry_SanDo_2(void)

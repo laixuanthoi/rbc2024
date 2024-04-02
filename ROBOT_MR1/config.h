@@ -52,13 +52,13 @@ vu8 DATA_SPEED[60] = {
 #define ID4 DATA_SPEED[13] = 4
 #define Motor_Gripper_Speed DATA_SPEED[15]
 #define Motor_Gripper_Direct DATA_SPEED[14]
-#define Motor_Gripper_Direct_Down DATA_SPEED[14] = 1
-#define Motor_Gripper_Direct_Up DATA_SPEED[14] = 0
+#define Motor_Gripper_Direct_Down DATA_SPEED[14] = 0
+#define Motor_Gripper_Direct_Up DATA_SPEED[14] = 1
 
 #define Bien_Tro_Gripper _ADC1_Value[2]
 
 //----- Motor Hut -----
-#define Motor_Hut TIM5->CCR2
+#define Motor_Hut TIM4->CCR2
 
 //----- Xi Lanh Gripper: Off Tha Ra, On rut zo -----
 #define Xi_Lanh_Gripper_On GPIO_WriteBit(GPIOB, GPIO_Pin_15, 1)
@@ -92,7 +92,7 @@ vu8 DATA_SPEED[60] = {
 
 //----- encoder canh tay ------
 #define Encoder_Arm_X (vs32)((num_over_t5 << 16) | TIM_GetCounter(TIM5)) / 100
-#define Encoder_Arm_Y (vs32)((num_over_t3 << 16) | TIM_GetCounter(TIM3))
+#define Encoder_Arm_Y (vs32)((num_over_t3 << 16) | TIM_GetCounter(TIM3))/100
 
 //----- cam bien tu-----
 #define Cam_Bien_Tu_Arm_Y_Top GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_7)
@@ -105,7 +105,7 @@ vu8 DATA_SPEED[60] = {
 #define Nut_San_Xanh GPIO_WriteBit(GPIOC, GPIO_Pin_15, 0)
 
 //-----
-#define Nut_1 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_5)
+#define Nut_1 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_13)
 #define Nut_2 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_1)
 #define Nut_3 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_14)
 #define Nut_4 GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_15)
@@ -124,7 +124,8 @@ vu16 _ADC1_Value[8];
 vu8 RX_USART1[15], RX_USART2[15];
 uint8_t MANG_GAME[10];
 extern unsigned char GP_BTN[15];
-
+int X_Thoi;
+int Y_Thoi;
 extern int _robotIMUAngle;
 
 int k = 0, i = 0;

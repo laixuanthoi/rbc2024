@@ -1,3 +1,21 @@
+#define PI 3.14159265358979323846
+
+struct Gripper{
+    int minMotorHut;
+    int maxMotorHut;
+    int motorHutGetBall;
+
+    int minMotorSpeed;
+    int maxMotorSpeed;
+
+    int minBienTro;
+    int maxBienTro;
+    int bienTroDropBall;
+    
+    int tagetBienTro;
+
+};
+struct Gripper gripper;
 
 struct ArmProperties
 {
@@ -22,6 +40,9 @@ struct ArmProperties
 
 struct ArmProperties armX;
 struct ArmProperties armY;
+int temp_x = 0;
+int temp_y = 100;
+
 
 int getEncoderArmX()
 {
@@ -55,222 +76,407 @@ void initArm()
 {
     // Arm X
     armX.minEncoders = -7000; // 7000 hz
-    armX.maxEncoders = 0;
+    armX.maxEncoders = -700;
     armX.minMilimets = 0; // 50 cm
-    armX.maxMilimets = 500;
+    armX.maxMilimets = 450;
 
     armX.minMotorSpeed = 2;
-    armX.maxMotorSpeed = 200;
+    armX.maxMotorSpeed = 250;
 
     armX.currentEncoders = 0;
     armX.currentMotorSpeed = armX.minMotorSpeed;
     armX.currentMotorDirection = 0;
 
-    armX.targetEncoders = (armX.minEncoders + armX.maxEncoders) / 2;
+    armX.targetEncoders = armX.maxEncoders;
     armX.targetMotorSpeed = armX.minMotorSpeed;
 
     armX.isRunning = 0;
     armX.isReady = 0;
 
     // Arm Y
-    armY.minEncoders = 0;
-    armY.maxEncoders = 3000;
+    armY.minEncoders = 10;
+    armY.maxEncoders = 1160;
     armY.minMilimets = 0;
-    armY.maxMilimets = 370; // 37cm
+    armY.maxMilimets = 420; // 37cm
 
-    armY.minMotorSpeed = 2;
+    armY.minMotorSpeed = 3;
     armY.maxMotorSpeed = 40;
 
     armY.currentEncoders = 0;
     armY.currentMotorSpeed = armY.minMotorSpeed;
     armY.currentMotorDirection = 0;
 
-    armY.targetEncoders = (armY.minEncoders + armY.maxEncoders) / 2;
+    armY.targetEncoders = armY.minEncoders;
     armY.targetMotorSpeed = armX.minMotorSpeed;
 
     armY.isRunning = 0;
     armY.isReady = 0;
+
+    //gripper
+    gripper.minMotorHut = 400;
+    gripper.maxMotorHut = 1200;
+    gripper.motorHutGetBall = 950;
+
+    gripper.minMotorSpeed = 2;
+    gripper.maxMotorSpeed = 100;
+
+    gripper.minBienTro = 330;
+    gripper.maxBienTro = 800;
+    gripper.bienTroDropBall = 450;
+    gripper.tagetBienTro = gripper.minBienTro;
+
+    Motor_Hut = gripper.minMotorHut;
+
 }
 
 bool isEqualEncoders(int encoderA, int encoderB)
 {
-    return abs(encoderA - encoderB) < 30;
-}
-
-void updateArm()
-{
-    armX.currentEncoders = getEncoderArmX();
-    armX.currentMotorDirection = Motor_Arm_X_Direct;
-    armX.currentMotorSpeed = Motor_Arm_X_Speed;
-    armX.isRunning = armX.currentMotorSpeed > armX.minMotorSpeed ? 1 : 0;
-
-    armY.currentEncoders = getEncoderArmY();
-    armY.currentMotorDirection = Motor_Arm_Y_Direct;
-    armY.currentMotorSpeed = Motor_Arm_Y_Speed;
-    armY.isRunning = armY.currentMotorSpeed > armY.minMotorSpeed ? 1 : 0;
+    return abs(encoderA - encoderB) < 20;
 }
 
 void resetArmXToReady()
 {
-    while (Cam_Bien_Tu_Arm_X_In)
-    {
-        Motor_Arm_X_Speed = 150;
-        Motor_Arm_X_Direct_In;
-        vTaskDelay(5);
-    }
 
-    // reset Encoder
+    Motor_Arm_X_Speed = armX.maxMotorSpeed;
+    Motor_Arm_X_Direct_In;
+		//check cham cam bien tu
+    for (i = 0; i < 50; i++)while (Cam_Bien_Tu_Arm_X_In) {vTaskDelay(1);}
+    
+    //dung lai va set motor dung yen , reset encoder x
+    Motor_Arm_X_Speed = armX.minMotorSpeed;
     TIM5->CNT = 0;
     num_over_t5 = 0;
-
-    while (getEncoderArmX() > -2000)
-    {
-        Motor_Arm_X_Speed = 150;
-        Motor_Arm_X_Direct_Out;
-        vTaskDelay(5);
-    }
-
-    Motor_Arm_X_Speed = 2;
-    armX.isReady = 1;
+	vTaskDelay(5);
+		
+	//cho motor chay ra vi tri min
+	Motor_Arm_X_Speed =  armX.maxMotorSpeed;
+    Motor_Arm_X_Direct_Out;
+	for (i = 0; i < 50; i++) while (getEncoderArmX() > armX.maxEncoders)  {vTaskDelay(1);}
+	Motor_Arm_X_Speed = armX.minMotorSpeed;
 }
 
-void setMotorArmX()
-{
-    armX.targetEncoders = map_MinMax(armX.targetEncoders, armX.minEncoders, armX.maxEncoders);
-    armX.targetMotorSpeed = map_MinMax(armX.targetMotorSpeed, armX.minMotorSpeed, armX.maxMotorSpeed);
-    if (!isEqualEncoders(armX.currentEncoders, armX.targetEncoders))
-    {
-        if (armX.targetEncoders > armX.currentEncoders) // in
-        {
-            Motor_Arm_X_Direct_In;
-            if (Cam_Bien_Tu_Arm_X_In)
-            {
-                Motor_Arm_X_Speed = armX.minMotorSpeed;
-            }
-            else
-            {
-                Motor_Arm_X_Speed = armX.targetMotorSpeed;
-            }
-        }
-        else // out
-        {
-            Motor_Arm_X_Direct_Out;
-            Motor_Arm_X_Speed = armX.targetMotorSpeed;
-        }
-    }
-    else // reach to target
-    {
-        Motor_Arm_X_Speed = armX.minMotorSpeed;
-    }
+int convertXMilimetsToEnoders(int milimets){
+	//conver mm to encoder
+	return (int)milimets*armX.minEncoders/armX.maxMilimets;
 }
 
-void moveArmXToEncoders(int targetEncoders, int targetSpeed)
-{
-    armX.targetEncoders = targetEncoders;
-    armX.targetMotorSpeed = targetSpeed;
+
+void giu_Tay_X(void){
+    int temp = 0;
+	//func loop giu tay X task dieu khien 
+    temp = getEncoderArmX();
+	if (!isEqualEncoders(armX.targetEncoders,temp)){
+		//do lech giua encoder taget > encoder der hien tai lon hon sai so
+		if(armX.targetEncoders > temp) Motor_Arm_X_Direct_In ;
+		else Motor_Arm_X_Direct_Out;
+		Motor_Arm_X_Speed = armX.maxMotorSpeed;
+        armX.isRunning = 1;
+		
+	}
+	else { Motor_Arm_X_Speed = armX.minMotorSpeed;armX.isRunning = 0;}
 }
 
-void moveArmXToMilimets(int targetMilimets, int targetSpeed)
+
+void moveXByActualLength(int length)
 {
-    armX.targetEncoders = map_int(targetMilimets, armX.minMilimets, armX.maxMilimets, armX.minEncoders, armX.maxEncoders);
-    armX.targetMotorSpeed = targetSpeed;
+    
+    int temp = 0;
+	temp = convertXMilimetsToEnoders(length);
+    if(temp < armX.minEncoders) temp = armX.minEncoders;
+    if(temp > armX.maxEncoders) temp = armX.maxEncoders; 
+	armX.targetEncoders = temp;
+}
+
+
+
+void reset_Encoder_Canh_Tay_Y(){
+    TIM3->CNT = 0;
+    num_over_t3 = 0;
+
+}
+
+int convertYMilimetsToEnoders(int milimets){
+	//conver mm to encoder
+	return (int)milimets*armY.maxEncoders/armY.maxMilimets;
+}
+
+void giu_Tay_Y(void){
+    int temp = 0;
+	//func loop giu tay X task dieu khien 
+    temp = getEncoderArmY();
+	if (!isEqualEncoders(armY.targetEncoders,temp)){
+		//do lech giua encoder taget > encoder der hien tai lon hon sai so
+		if(armY.targetEncoders > temp) Motor_Arm_Y_Direct_Down ;
+		else Motor_Arm_Y_Direct_Up;
+		Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+		
+	}
+	else Motor_Arm_Y_Speed = armY.minMotorSpeed;
+}
+void moveYByActualLength(int length){
+    int temp = 0;
+	temp = convertYMilimetsToEnoders(length);
+	armY.targetEncoders = temp;
 }
 
 // ===== ARM Y =====
 void resetArmYToReady()
 {
-    while (Cam_Bien_Tu_Arm_Y_Top)
+	Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    Motor_Arm_Y_Direct_Up;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Top) {vTaskDelay(1);}
+    reset_Encoder_Canh_Tay_Y();
+    Motor_Arm_Y_Speed = armY.minMotorSpeed;
+    vTaskDelay(5);
+    Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    Motor_Arm_Y_Direct_Down;
+    for (i = 0; i < 50; i++) while (getEncoderArmY() < 1000) {vTaskDelay(1);}
+    Motor_Arm_Y_Speed = armY.minMotorSpeed;
+
+}
+
+void cartesianToPolar(int x, int y,float *r,float *theta) {
+    *r = sqrt(x * x + y * y);
+    *theta = atan2(y, x)*(180.0/PI);
+}
+
+
+void moveArmToXYWithDelta(int x,int y,int delta){
+    float r,theta;
+    cartesianToPolar(x,y,&r,&theta);
+    if(theta > 100)  theta -= delta;
+    else theta += delta;
+    moveXByActualLength(r);
+    moveBaseByAngle(theta);
+}
+
+
+void moveArmToXY(int x,int y){
+    float r,theta;
+    cartesianToPolar(x,y,&r,&theta);
+    moveXByActualLength(r);
+    moveBaseByAngle(theta);
+}
+
+
+
+//gripper
+
+bool isEqualBienTroGripper(int bt_a,int bt_b){
+    return abs(bt_a - bt_b) < 25;
+}
+
+int getBienTroGripper()
+{
+    int en, enOld = Bien_Tro_Gripper;
+    u16 i = 0;
+    while (i < 2)
     {
-        vTaskDelay(5);
-        Motor_Arm_Y_Speed = 50;
-        Motor_Arm_Y_Direct_Up;
+        en = Bien_Tro_Gripper;
+        if (abs(en - enOld) < 50)
+            i++;
+        enOld = en;
     }
+    return abs(en);
+}
 
-    Motor_Arm_Y_Speed = 2;
+void resetArmGripperToReady(){
+    int temp = 0;
+    temp = getBienTroGripper();
+    for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){
+        if(gripper.tagetBienTro > temp ) Motor_Gripper_Direct_Up;
+        else Motor_Gripper_Direct_Down;
+        Motor_Gripper_Speed = gripper.maxMotorSpeed;
+        temp = getBienTroGripper();
+    }
+    Motor_Gripper_Speed = gripper.minMotorSpeed;
 
-    // reset Encoder
-    TIM3->CNT = 0;
-    num_over_t3 = 0;
+}
+
+
+void giuMotorGripper(){
+    int temp = 0;
+    temp = getBienTroGripper();
+    //dua motor xuong duoi goc 0 do
+    if(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){
+        if(gripper.tagetBienTro > temp ) Motor_Gripper_Direct_Up;
+        else Motor_Gripper_Direct_Down;
+        Motor_Gripper_Speed = gripper.maxMotorSpeed;
+    }
+    else Motor_Gripper_Speed = gripper.minMotorSpeed;
+}
+
+void gripperGetBall(){
+    Motor_Hut = gripper.maxMotorHut;
+    vTaskDelay(5);
+    Motor_Arm_Y_Direct_Down;
+    Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Bottom){vTaskDelay(1);}
+    Motor_Arm_Y_Speed = armY.minMotorSpeed;
+    
+    Xi_Lanh_Gripper_Off;
+    
+    vTaskDelay(4000);
+    // gripper.tagetBienTro = gripper.minBienTro;
+    // vTaskDelay(5);
+    // for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){temp = getBienTroGripper();vTaskDelay(1);}
+    
+
+    // temp = getBienTroGripper();
+    // gripper.tagetBienTro = gripper.maxBienTro;
+
+    // vTaskDelay(5);
+    // for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){temp = getBienTroGripper();vTaskDelay(1);}
+
+    Xi_Lanh_Gripper_On;
+    vTaskDelay(4000);
+    //Motor_Hut = gripper.motorHutGetBall;
+    Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    Motor_Arm_Y_Direct_Up;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Top){vTaskDelay(1);}
+    Motor_Arm_Y_Speed = armY.minMotorSpeed;
+}
+
+void gripperDropBall(){
+    int temp = 0;
+    temp = getBienTroGripper();
+
+    Motor_Hut = gripper.maxMotorHut;
+    gripper.tagetBienTro = gripper.bienTroDropBall;
     vTaskDelay(5);
 
-    while (getEncoderArmY() < 500)
-    {
-        vTaskDelay(5);
-        Motor_Arm_Y_Speed = 50;
-        Motor_Arm_Y_Direct_Down;
-    }
+    for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){temp = getBienTroGripper();vTaskDelay(1);}
+    Motor_Hut = gripper.minMotorHut;
+    Xi_Lanh_Gripper_On;
+    vTaskDelay(500);
 
-    Motor_Arm_Y_Speed = 2;
-    armY.isReady = 1;
 }
 
-void setMotorArmY()
-{
-    armY.targetEncoders = map_MinMax(armY.targetEncoders, armY.minEncoders, armY.maxEncoders);
-    armY.targetMotorSpeed = map_MinMax(armY.targetMotorSpeed, armY.minMotorSpeed, armY.maxMotorSpeed);
 
-    if (!isEqualEncoders(armY.currentEncoders, armY.targetEncoders))
+
+void gripperGetBallByXY(int x,int y){
+    float r,theta;
+    int temp;
+    cartesianToPolar(x,y,&r,&theta);
+    armX.isRunning = 1;
+    base.isRunning = 1;
+   
+    moveXByActualLength(r);
+    moveBaseByAngle(theta);
+   
+    for (i = 0; i < 50; i++) while (armX.isRunning == 1 || base.isRunning == 1)
     {
-        if (armY.targetEncoders > armY.currentEncoders) // down
-        {
-            Motor_Arm_Y_Direct_Down;
-            if (Cam_Bien_Tu_Arm_Y_Bottom)
-            {
-                Motor_Arm_Y_Speed = armY.minMotorSpeed;
-            }
-            else
-            {
-                Motor_Arm_Y_Speed = armY.targetMotorSpeed;
-            }
-        }
-        else
-        {
-            Motor_Arm_Y_Direct_Up;
-            if (Cam_Bien_Tu_Arm_Y_Top)
-            {
-                Motor_Arm_Y_Speed = armY.minMotorSpeed;
-            }
-            else
-            {
-                Motor_Arm_Y_Speed = armY.targetMotorSpeed;
-            }
-        }
+        vTaskDelay(1);
     }
-    else // reach to target
-    {
-        Motor_Arm_Y_Speed = armY.minMotorSpeed;
-    }
+    temp = getBienTroGripper();
+    Motor_Hut = gripper.maxMotorHut;
+    gripper.tagetBienTro = gripper.minBienTro;
+    vTaskDelay(5);
+    for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){temp = getBienTroGripper();vTaskDelay(1);}
+
+    Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    Motor_Arm_Y_Direct_Down;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Bottom){vTaskDelay(1);}
+    Motor_Arm_Y_Speed = armY.minMotorSpeed;
+    Xi_Lanh_Gripper_On;
+    vTaskDelay(4000);
+
+    temp = getBienTroGripper();
+    gripper.tagetBienTro = gripper.maxBienTro;
+
+    vTaskDelay(5);
+    for (i = 0; i < 50; i++) while(!isEqualBienTroGripper(gripper.tagetBienTro,temp)){temp = getBienTroGripper();vTaskDelay(1);}
+
+    Xi_Lanh_Gripper_On;
+    vTaskDelay(4000);
+    Motor_Hut = gripper.motorHutGetBall;
+    Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    Motor_Arm_Y_Direct_Up;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Top){vTaskDelay(1);}
+    Motor_Arm_Y_Speed = armY.minMotorSpeed;
 }
 
-void moveArmYToEncoders(int targetEncoders, int targetSpeed)
-{
-    armY.targetEncoders = targetEncoders;
-    armY.targetMotorSpeed = targetSpeed;
-}
 
-void moveArmYToMilimets(int targetMilimets, int targetSpeed)
-{
-    armY.targetEncoders = map_int(targetMilimets, armY.minMilimets, armY.maxMilimets, armY.minEncoders, armY.maxEncoders);
-    armY.targetMotorSpeed = targetSpeed;
-}
 
-static void taskArm(void *p)
-{
-    initArm();
-    resetArmYToReady();
-    while (1)
-    {
-        vTaskDelay(5);
-        // updateArm();
-        // if (!armY.isReady || !armX.isReady)
-        // {
-        //     resetArmYToReady();
-        //     resetArmXToReady();
-        // }
-        // else
-        // {
-        //     setMotorArmX();
-        //     setMotorArmY();
-        // }
+///ham run
+
+
+
+void runToSilo0Red(){
+    armX.targetEncoders = -3000;
+    RESET_ENCODER_WH();
+    robotRunAngle(0,50,0,0.3);
+    for(i=0;i<50;i++) while (lazerTruocValue > 30){
+        if(lazerTraiValue > 170) robotRunAngle(-50,50,0,0.3);
+        else if (lazerTraiValue < 170) robotRunAngle(50,50,0,0.3);
+        else robotRunAngle(0,50,0,0.3);
+        vTaskDelay(1);
     }
+    robotRunAngle(0,10,0,0.3);
+    for(i=0;i<50;i++) while (lazerTruocValue > 5){vTaskDelay(1);}
+    for(i=0;i<50;i++) while (abs(lazerTraiValue - 170) > 1)
+    {
+        if(lazerTraiValue > 170) robotRunAngle(-950,10,0,-0.3);
+        else robotRunAngle(950,10,0,0.3);
+    }
+    robotStop(0);
+    //gripperGetBallByXY(0,300);
+
+
+}
+
+
+void test_gap_bong(){
+
+    temp_x = 0;
+    temp_y = 100;
+    // RESET_ENCODER_WH();
+    Motor_Arm_Y_Speed = armY.maxMotorSpeed;
+    Motor_Arm_Y_Direct_Up;
+    for (i = 0; i < 50; i++) while (Cam_Bien_Tu_Arm_Y_Top) {vTaskDelay(1);}
+    Motor_Arm_Y_Speed = armY.minMotorSpeed;
+    moveArmToXY(temp_x,temp_y);
+    armX.isRunning = 1;
+    base.isRunning = 1;
+    for (i = 0; i < 50; i++) while (armX.isRunning == 1 || base.isRunning == 1)
+    {
+        vTaskDelay(1);
+    }
+    // robotRunAngle(1800,50,0,0.3);
+    // for(i=0;i<50;i++) while (getEncoderTong() < 2800){
+    //     if(lazerTraiValue > 170) robotRunAngle(1850,50,0,0.3);
+    //     else if (lazerTraiValue < 170) robotRunAngle(1750,50,0,0.3);
+    //     else robotRunAngle(1800,50,0,0.3);
+    //     vTaskDelay(1);}
+    // robotStop(0);
+    vTaskDelay(20000);
+    getXYFromXuanThoi();
+    temp_x += X_Thoi;
+    temp_y += Y_Thoi;
+    armX.isRunning = 1;
+    base.isRunning = 1;
+    moveArmToXYWithDelta(temp_x,temp_y,10);
+    for (i = 0; i < 50; i++) while (armX.isRunning == 1 || base.isRunning == 1)
+    {
+        vTaskDelay(1);
+    }
+    //gripperGetBall();
+    // base.targetBienTro = 77; // xoay mam ve sau
+    // RESET_ENCODER_WH();
+    // robotRunAngle(0,50,0,0.3);
+    // for(i=0;i<50;i++) while (getEncoderTong() < 1300){
+    //     if(lazerTraiValue > 170) robotRunAngle(-50,50,0,0.3);
+    //     else if (lazerTraiValue < 170) robotRunAngle(50,50,0,0.3);
+    //     else robotRunAngle(0,50,0,0.3);
+    //     vTaskDelay(1);}
+    // for(i=0;i<50;i++) while (lazerTruocValue > 170){
+    //     if(lazerTraiValue > 170) robotRunAngle(-50,10,0,0.3);
+    //     else if (lazerTraiValue < 170) robotRunAngle(50,10,0,0.3);
+    //     else robotRunAngle(0,10,0,0.3);
+    //     vTaskDelay(1);
+    // }    
+    robotStop(0);
+
+
+
 }
