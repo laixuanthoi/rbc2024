@@ -92,7 +92,7 @@ vu8 DATA_SPEED[60] = {
 
 //----- encoder canh tay ------
 #define Encoder_Arm_X (vs32)((num_over_t5 << 16) | TIM_GetCounter(TIM5)) / 100
-#define Encoder_Arm_Y (vs32)((num_over_t3 << 16) | TIM_GetCounter(TIM3))/10
+#define Encoder_Arm_Y (vs32)((num_over_t3 << 16) | TIM_GetCounter(TIM3))/100
 
 //----- cam bien tu-----
 #define Cam_Bien_Tu_Arm_Y_Top GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_7)
@@ -124,7 +124,8 @@ vu16 _ADC1_Value[8];
 vu8 RX_USART1[15], RX_USART2[15];
 uint8_t MANG_GAME[10];
 extern unsigned char GP_BTN[15];
-
+int X_Thoi;
+int Y_Thoi;
 extern int _robotIMUAngle;
 
 int k = 0, i = 0;

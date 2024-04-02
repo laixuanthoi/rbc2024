@@ -36,7 +36,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x66078547)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x66078547)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x66078547)
 F (..\Libraries\CMSIS\Device\ST\STM32F4xx\Source\Templates\arm\startup_stm32f4xx.s)(0x66078547)(--cpu Cortex-M4.fp.sp -g --apcs=interwork --pd "__MICROLIB SETA 1"-I.\RTE\_Project-IC:\Users\sonng\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Users\sonng\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include--pd "__UVISION_VERSION SETA 531" --pd "_RTE_ SETA 1" --pd "STM32F407xx SETA 1" --pd "_RTE_ SETA 1"--list .\project\startup_stm32f4xx.lst --xref -o .\project\startup_stm32f4xx.o --depend .\project\startup_stm32f4xx.d)
-F (.\utils.h)(0x66078547)()
+F (.\utils.h)(0x66082E36)()
 F (..\stm32f4xx_it.c)(0x66078547)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\sonng\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Users\sonng\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\stm32f4xx_it.o --omf_browse .\project\stm32f4xx_it.crf --depend .\project\stm32f4xx_it.d)
 I (..\stm32f4xx_it.h)(0x66078547)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x66078547)
@@ -75,7 +75,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x66078547)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x66078547)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5EC7840C)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5EC7840C)
-F (..\main.c)(0x6607E8F2)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\sonng\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Users\sonng\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\main.o --omf_browse .\project\main.crf --depend .\project\main.d)
+F (..\main.c)(0x660AD36F)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\sonng\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Users\sonng\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\main.o --omf_browse .\project\main.crf --depend .\project\main.d)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x66078547)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x66078547)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5EC7840C)
@@ -123,25 +123,27 @@ I (..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F\portmacro.h)(0x66078
 I (..\FreeRTOSV7.3.0\FreeRTOS\Source\include\mpu_wrappers.h)(0x66078547)
 I (..\FreeRTOSV7.3.0\FreeRTOS\Source\include\task.h)(0x66078547)
 I (..\FreeRTOSV7.3.0\FreeRTOS\Source\include\list.h)(0x66078547)
-I (..\config.h)(0x6607E765)
+I (..\config.h)(0x6609AD4B)
 I (..\LID_HMI.h)(0x66078547)
-I (..\MDK-ARM\utils.h)(0x66078547)
+I (..\MDK-ARM\utils.h)(0x66082E36)
 I (..\doc_tay_game.h)(0x66078547)
 I (..\4OmniControler.h)(0x66078547)
-I (..\MDK-ARM\Robot_Base.h)(0x6607B543)
-I (..\MDK-ARM\Robot_Arm.h)(0x6607EF1B)
-F (..\config.h)(0x6607E765)()
+I (..\BasicFunction.h)(0x660958BC)
+I (..\MDK-ARM\uart_comunicate.h)(0x660AD391)
+I (..\MDK-ARM\Robot_Base.h)(0x660ADEAB)
+I (..\MDK-ARM\Robot_Arm.h)(0x660ADF7F)
+F (..\config.h)(0x6609AD4B)()
 F (..\doc_tay_game.h)(0x66078547)()
-F (..\BasicFunction.h)(0x66078547)()
+F (..\BasicFunction.h)(0x660958BC)()
 F (..\LID_HMI.h)(0x66078547)()
 F (..\FreeRTOSConfig.h)(0x66078547)()
 F (..\DieuKhienCoCau.h)(0x66078547)()
-F (..\ROBOTRUN.h)(0x66078547)()
+F (..\ROBOTRUN.h)(0x660971FA)()
 F (..\4OmniControler.h)(0x66078547)()
-F (.\uart_comunicate.h)(0x66078547)()
-F (.\Robot_Arm.h)(0x6607EF1B)()
+F (.\uart_comunicate.h)(0x660AD391)()
+F (.\Robot_Arm.h)(0x660ADF7F)()
 F (.\Time.h)(0x66078547)()
-F (.\Robot_Base.h)(0x6607B543)()
+F (.\Robot_Base.h)(0x660ADEAB)()
 F (..\Libraries\STM32F4xx_StdPeriph_Driver\src\misc.c)(0x66078547)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\sonng\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Users\sonng\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\misc.o --omf_browse .\project\misc.crf --depend .\project\misc.d)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x66078547)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x66078547)
@@ -422,7 +424,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_syscfg.h)(0x66078547)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x66078547)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x66078547)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x66078547)
-F (..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c)(0x66078547)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\sonng\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Users\sonng\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\stm32f4xx_usart.o --omf_browse .\project\stm32f4xx_usart.crf --depend .\project\stm32f4xx_usart.d)
+F (..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c)(0x6609CC2B)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\sonng\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IC:\Users\sonng\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\stm32f4xx_usart.o --omf_browse .\project\stm32f4xx_usart.crf --depend .\project\stm32f4xx_usart.d)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h)(0x66078547)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x66078547)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x66078547)

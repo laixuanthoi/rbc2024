@@ -1,4 +1,86 @@
 
+
+void chongNhieuADCValue(void){
+    static unsigned int lazeTruocCouter = 0, lazeTruoc_SUM = 0;
+	static unsigned int lazeTraiCouter = 0, lazeTrai_SUM = 0;
+	static unsigned int lazePhaiCouter = 0, lazePhai_SUM = 0;
+    if(lazeTruocCouter++ < 50)	
+	{
+		lazeTruoc_SUM += Lazer_Front;  
+	}
+	else
+    {
+		lazerTruocValue = lazeTruoc_SUM/50;
+		lazeTruocCouter = 0;
+		lazeTruoc_SUM = 0;}
+
+    if(lazePhaiCouter++ < 150)	
+	{
+		lazePhai_SUM += Lazer_Right;  
+	}
+	else
+    {
+		lazerPhaiValue = lazePhai_SUM/150;
+		lazePhaiCouter = 0;
+		lazePhai_SUM = 0;}
+    
+    if(lazeTraiCouter++ < 150)	
+	{
+		lazeTrai_SUM += Lazer_Left;  
+	}
+	else
+    {
+		lazerTraiValue = lazeTrai_SUM/150;
+		lazeTraiCouter = 0;
+		lazeTrai_SUM = 0;
+	}
+
+}
+
+int getEncoderRearLeft()
+{
+    int en, enOld = Encoder_Wheel_Rear_Left;
+    int i = 0;
+    while (i < 2)
+    {
+        en = Encoder_Wheel_Rear_Left;
+        if (abs(en - enOld) < 50)
+            i++;
+        enOld = en;
+    }
+    return abs(en);
+}
+
+int getEncoderRearRight()
+{
+    int en, enOld = Encoder_Wheel_Rear_Right;
+    int i = 0;
+    while (i < 2)
+    {
+        en = Encoder_Wheel_Rear_Right;
+        if (abs(en - enOld) < 50)
+            i++;
+        enOld = en;
+    }
+    return abs(en);
+}
+ int getEncoderTong(){
+    return getEncoderRearLeft() + getEncoderRearRight();
+ }
+
+void RESET_ENCODER_WH(){
+    TIM1->CNT = 0;num_over_t1 = 0;
+	TIM2->CNT = 0;num_over_t2 = 0;
+}
+
+
+
+
+
+
+
+
+
 ////*****************************8 bien toan cuc *************************************
 //char 	Khoang_cach_1_vong = 16, bien_xl_nang_ha, bien_xl_mac_vong, bien_xl_chot, bien_xl_kep_vong, bien_xl_day,bien_xl_tru_giua,bien_xl_keo_loxo;
 //char	vi_tri = 0, Cbcc = 0, Cbnv = 0,Cbnn = 0, Resetnangvong = 0;

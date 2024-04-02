@@ -15,6 +15,8 @@
         "utils.h": "c",
         "robot_arm.h": "c",
         "4omnicontroler.h": "c",
-        "freertos.h": "c"
+        "freertos.h": "c",
+        "basicfunction.h": "c",
+        "stm32f4xx_i2c.h": "c"
     }
 }

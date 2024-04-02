@@ -16,6 +16,7 @@ struct BaseProperties
 
     int isRunning;
     int isReady;
+    int isAutoRobot;
 };
 
 struct BaseProperties base;
@@ -47,11 +48,12 @@ void initBase()
     base.currentMotorSpeed = base.minMotorSpeed;
     base.currentMotorDirection = 0;
 
-    base.targetBienTro = 600;
+    base.targetBienTro = 500;
     base.targetMotorSpeed = base.minMotorSpeed;
 
-    base.isRunning = 1; // check base is running
+    base.isRunning = 0; // check base is running
     base.isReady = 0;   // check ready
+    base.isAutoRobot = 0;
 }
 
 bool isEqualBienTro(int bientroA, int bientroB)
@@ -61,15 +63,18 @@ bool isEqualBienTro(int bientroA, int bientroB)
 
 void giuBase()
 {
+    if (base.isAutoRobot == 0){
     //ham chay loop trong task con de dich chuyen mam xoay khi thay doi tagetbt
-    int temp = 0;
-    temp = getBienTroBase();
-    if(!isEqualBienTro(base.targetBienTro,temp)){
-        if(base.targetBienTro > temp) Motor_Base_Direct_Right;
-        else Motor_Base_Direct_Left;
-        Motor_Base_Speed = base.maxMotorSpeed;
+        int temp = 0;
+        temp = getBienTroBase();
+        if(!isEqualBienTro(base.targetBienTro,temp)){
+            if(base.targetBienTro > temp) Motor_Base_Direct_Right;
+            else Motor_Base_Direct_Left;
+            Motor_Base_Speed = base.maxMotorSpeed;
+            base.isRunning = 1;
+        }
+        else {Motor_Base_Speed = base.minMotorSpeed;base.isRunning = 0;}
     }
-    else Motor_Base_Speed = base.minMotorSpeed;
 }
 
 

@@ -52,5 +52,7 @@
 .\project\main.o: ..\MDK-ARM\utils.h
 .\project\main.o: ..\doc_tay_game.h
 .\project\main.o: ..\4OmniControler.h
+.\project\main.o: ..\BasicFunction.h
+.\project\main.o: ..\MDK-ARM\uart_comunicate.h
 .\project\main.o: ..\MDK-ARM\Robot_Base.h
 .\project\main.o: ..\MDK-ARM\Robot_Arm.h
