@@ -29,18 +29,6 @@ float degrees_to_radians(float degree)
 {
     return (float)(degree * (PI / 180.0));
 }
-
-// convert encoder counts to radians
-float encoders_to_radians(int encoder_count, int encoder_resolution)
-{
-    return (float)((encoder_count / encoder_resolution) * 2 * PI * 1.0);
-}
-
-float encoders_to_degrees(int encoder_count, int encoder_resolution)
-{
-    return radians_to_degrees(encoders_to_radians(encoder_count, encoder_resolution));
-}
-
 // void polar_to_cartersian(float &rho, float &phi, int &x, int &y)
 // {
 //     x = rho * cos(phi);

@@ -39,7 +39,7 @@ void initBase()
 {
     base.minBienTro = 3; // set bien tro range
     base.maxBienTro = 885;
-    base.oneAngleToBienTro = 10/3; // 600 bt la goc 90* 900 bt la goc 0 do => 300 bt = 90* => 1 do = 300/90 = 10/3
+    base.oneAngleToBienTro = 10 / 3; // 600 bt la goc 90* 900 bt la goc 0 do => 300 bt = 90* => 1 do = 300/90 = 10/3
 
     base.minMotorSpeed = 2; // set motor speed range
     base.maxMotorSpeed = 30;
@@ -63,46 +63,49 @@ bool isEqualBienTro(int bientroA, int bientroB)
 
 void giuBase()
 {
-    if (base.isAutoRobot == 0){
-    //ham chay loop trong task con de dich chuyen mam xoay khi thay doi tagetbt
+    if (base.isAutoRobot == 0)
+    {
+        // ham chay loop trong task con de dich chuyen mam xoay khi thay doi tagetbt
         int temp = 0;
         temp = getBienTroBase();
-        if(!isEqualBienTro(base.targetBienTro,temp)){
-            if(base.targetBienTro > temp) Motor_Base_Direct_Right;
-            else Motor_Base_Direct_Left;
+        if (!isEqualBienTro(base.targetBienTro, temp))
+        {
+            if (base.targetBienTro > temp)
+                Motor_Base_Direct_Right;
+            else
+                Motor_Base_Direct_Left;
             Motor_Base_Speed = base.maxMotorSpeed;
             base.isRunning = 1;
         }
-        else {Motor_Base_Speed = base.minMotorSpeed;base.isRunning = 0;}
+        else
+        {
+            Motor_Base_Speed = base.minMotorSpeed;
+            base.isRunning = 0;
+        }
     }
 }
 
-
-
 int calculateBienTroBase(float angle)
 {
-    //ham tinh toan taget bien tro  tu angle 
-    // cong thuc se bang maxbt = 900 la goc 0 do - di goc muon quay*so bien trocua 1 do
-    return (int)base.maxBienTro - angle*base.oneAngleToBienTro; 
+    // ham tinh toan taget bien tro  tu angle
+    //  cong thuc se bang maxbt = 900 la goc 0 do - di goc muon quay*so bien trocua 1 do
+    return (int)base.maxBienTro - angle * base.oneAngleToBienTro;
 }
 // float calcuta
 
-void moveBaseByAngle(float angle){
-    //func di chyen mam xoay by angle
-    if(angle < 0) angle = 0;
-    if(angle > 270) angle = 270;
+void moveBaseByAngle(float angle)
+{
+    // func di chyen mam xoay by angle
+    if (angle < 0)
+        angle = 0;
+    if (angle > 270)
+        angle = 270;
     base.targetBienTro = calculateBienTroBase(angle);
 }
 
-
 float calculateAngleBase(int bienTro)
 {
-
 }
-
-
-
-
 
 // void updateBase()
 // {
