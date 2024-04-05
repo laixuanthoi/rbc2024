@@ -1,3 +1,4 @@
+
 // #include "cmsis_os.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_gpio.h"
@@ -14,18 +15,17 @@
 
 #include "doc_tay_game.h"
 #include "4OmniControler.h"
+
+#include "Arm.h"
 #include "BasicFunction.h"
-#include "uart_comunicate.h"
-
-// #include "Ban_Tay.h"
-// #include "Canh_Tay.h"
-#include "Robot_Base.h"
-#include "Robot_Arm.h"
-
-// #include "Motor_Hut.h"
-// #include "Mam_Xoay.h"
+#include "ROBOTRUN.h"
+#include "WheelController.h"
 
 vs32 HMI_LOOP;
+
+int xBall_Main, yBall_Main;
+int realWith = 300, realHeight = 300;
+int armPosX, armPosY;
 
 void HMI_TRAN(vs32 _so_dong)
 {
@@ -54,13 +54,13 @@ void HMI_TRAN(vs32 _so_dong)
 		HMI_DMI("IMU:", _robotIMUAngle, 1);
 		break;
 	case 2:
-		HMI_DMI("LAZER FRONT:", lazerTruocValue, 2);
+		HMI_DMI("LAZER FRONT:", _lazerFront, 2);
 		break;
 	case 3:
-		HMI_DMI("LAZER LEFT:", lazerTraiValue, 3);
+		HMI_DMI("LAZER LEFT:", _lazerLeft, 3);
 		break;
 	case 4:
-		HMI_DMI("LAZER RIGHT:", lazerPhaiValue, 4);
+		HMI_DMI("LAZER RIGHT:", _lazerRight, 4);
 		break;
 	case 5:
 		HMI_DMI("EN WH LEFT:", getEncoderRearLeft(), 5);
@@ -69,7 +69,7 @@ void HMI_TRAN(vs32 _so_dong)
 		HMI_DMI("EN WH RIGHT:", getEncoderRearRight(), 6);
 		break;
 	case 7:
-		HMI_DMI("EN 3 WHS:", getEncoderTong(), 7);
+		HMI_DMI("EN Front:", getEncoderFront(), 7);
 		break;
 
 	case 8:
@@ -82,19 +82,20 @@ void HMI_TRAN(vs32 _so_dong)
 		HMI_DMI("BT BASE:", Bien_Tro_Base, 10);
 		break;
 	case 11:
-		HMI_DMI("BT GRIPPER:", Bien_Tro_Gripper, 11);
+		UART_ReceiveFromRaspberry(&xBall_Main, &yBall_Main);
+		xBall_Main = map_int(xBall_Main - 160, -160, 160, -160, 160);
+		HMI_DMI("X BALL:", xBall_Main, 11);
 		break;
 	case 12:
-		// HMI_DMI("T BT MAM XOAY:", Target_Bien_Tro_Mam_Xoay, 12);
-		HMI_DMI("Motor y: ", Motor_Arm_Y_Speed, 12);
+		yBall_Main = map_int(120 - yBall_Main, -120, 120, -160, 160);
+		HMI_DMI("X BALL:", yBall_Main, 12);
 		break;
 	case 13:
-		HMI_DMI("Y:", Y_Thoi, 13);
-		// HMI_DMI("T BT BAN TAY:", Target_Bien_Tro_Ban_Tay, 13);
+		getArmPos2D(&armPosX, &armPosY);
+		HMI_DMI("ARM POS X:", armPosX, 13);
 		break;
 	case 14:
-		HMI_DMI("X:", X_Thoi, 14);
-		// HMI_DMI("TIME:", time_now, 14);
+		HMI_DMI("ARM POS Y:", armPosY, 14);
 		break;
 	case 15:
 		//	hien thi phan ngo vao
@@ -185,10 +186,11 @@ void Config_Robot(void)
 {
 	Config_Out_Mode();
 	Config_In_Mode();
-
+	Config_pwm_time_t8();
 	Config_encoder_timer2_timer3();
 	Config_encoder_timer1();
-	Config_pwm_time_t4();
+
+	// Config_encoder_timer4();
 
 	Config_ADC1_DMA();
 
@@ -202,7 +204,7 @@ void Config_Robot(void)
 	UART5_DMA_TX(921600);
 
 	Config_encoder_timer5();
-	// Config_encoder_timer4();
+	Config_encoder_timer4();
 
 	vTaskDelay(5);
 }
@@ -214,42 +216,64 @@ static void taskLCD(void *pvParameters)
 		vTaskDelay(15);
 	}
 }
-static void taskDieuKhienCoCau(void *pvParameters)
-{
-	while (1)
-	{
-		//ADCValue_Control();
-		//		Giu_Tay_Nang_Bong();
-		//		Giu_Truc_Y();
-		//		Giu_Truc_X();
-		//		Giu_Mam_Xoay();
-		giu_Tay_X();
-		giuBase();
-		giuMotorGripper();
-		vTaskDelay(10);
-	}
-}
-static void taskGiaoTiepRas(void *pvParameters)
-{
-	while (1)
-	{
-		
-		//USART_SendSTRING();
-		getXYFromXuanThoi();
-		vTaskDelay(15);
-	}
-}
 
-static void taskChongNhieu(void *pvParameters)
+static void taskUartCommunicateWithRas(void *pvParameters)
 {
 	while (1)
 	{
-		// ADCValue_Control();
-		chongNhieuADCValue();
-		getXYFromXuanThoi();
+		UART_SendToRaspberry();
 		vTaskDelay(5);
 	}
 }
+
+static void taskChongNhieuLazer(void *p)
+{
+	int lazerLeftCount = 0, lazerLeftSum = 0;
+	int lazerRightCount = 0, lazerRightSum = 0;
+	int lazerFrontCount = 0, lazerFrontSum = 0;
+
+	int numCounter = 100;
+	while (1)
+	{
+		vTaskDelay(5);
+
+		// front
+		if (lazerFrontCount++ < numCounter)
+		{
+			lazerFrontSum += Lazer_Front;
+		}
+		else
+		{
+			_lazerFront = lazerFrontSum / numCounter;
+			lazerFrontCount = 0;
+			lazerFrontSum = 0;
+		}
+
+		// right
+		if (lazerRightCount++ < numCounter)
+		{
+			lazerRightSum += Lazer_Right;
+		}
+		else
+		{
+			_lazerRight = lazerRightSum / numCounter;
+			lazerRightCount = 0;
+			lazerRightSum = 0;
+		}
+		// left
+		if (lazerLeftCount++ < numCounter)
+		{
+			lazerLeftSum += Lazer_Left;
+		}
+		else
+		{
+			_lazerLeft = lazerLeftSum / numCounter;
+			lazerLeftCount = 0;
+			lazerLeftSum = 0;
+		}
+	}
+}
+
 static void taskRobotAnalytics(void *pvParameters)
 {
 	while (1)
@@ -259,50 +283,48 @@ static void taskRobotAnalytics(void *pvParameters)
 	}
 }
 static void taskMain(void *pvParameters)
-{	
+{
 	Config_Robot();
-	initArm();
-	initBase();
-	// xTaskCreate(taskBase, (signed char *)"taskBase", 256, NULL, 0, NULL);
-	//xTaskCreate(taskArm, (signed char *)"taskArm", 256, NULL, 0, NULL);
-	
-	xTaskCreate(taskChongNhieu, (signed char *)"taskChongNhieu", 256, NULL, 0, NULL);
-	xTaskCreate(taskRobotAnalytics, (signed char*)"taskRobotAnalytics", 256, NULL, 0, NULL);
-	USART_SendSTRING();
+
+	xTaskCreate(taskUartCommunicateWithRas, (signed char *)"taskUartCommunicateWithRas", 256, NULL, 0, NULL);
+	xTaskCreate(taskChongNhieuLazer, (signed char *)"taskChongNhieuLazer", 256, NULL, 0, NULL);
+	xTaskCreate(taskRobotAnalytics, (signed char *)"taskRobotAnalytics", 256, NULL, 0, NULL);
+	// reset encoder chay va imu
 	robotResetIMU();
-	resetArmYToReady();
-	resetArmGripperToReady();
-	resetArmXToReady();
 	RESET_ENCODER_WH();
-	xTaskCreate(taskDieuKhienCoCau, (signed char *)"taskDieuKhienCoCau", 256, NULL, 0, NULL);
-	//xTaskCreate(taskGiaoTiepRas, (signed char *)"taskGiaoTiepRas", 256, NULL, 0, NULL);
-	
+
+	resetRobotArm();
+	resetBase();
+
+	// while (moveArmYByMilimet(10, 50))
+	// 	vTaskDelay(5);
+	// stopArmY();
+
+	// // move arm to XY
+	// while (moveArmToXY(0, 100))
+	// 	vTaskDelay(5);
+	// stopArmX();
+	// stopBase();
+
+	// // while (rotateGripperByAngle(60, 50))
+	// // 	vTaskDelay(5);
+	// // stopGripper();
+
+	// trackingBall();
+	robotRunToBall();
 	while (1)
 	{
-		
 		if (!Nut_1)
 		{
-
-			
-			test_gap_bong();
-			// robotRun(0,10);
-			// for(i=0;i<50;i++) while (getEncoderTong() < 1000)
-			// {
-			// 	vTaskDelay(1);
-			// }
-			
-			//vTaskDelay(2000);
-			// moveArmXToEncoders(-3000, 150);
-			// moveArmYToEncoders(1500, 150);
+			// runToSilo(2);
 			vTaskDelay(5);
 		}
-
 	}
 }
 int main(void)
 {
 	xTaskCreate(taskMain, (signed char *)"taskMain", 256, NULL, 0, NULL);
 	xTaskCreate(taskLCD, (signed char *)"taskLCD", 256, NULL, 0, NULL);
-	
+
 	vTaskStartScheduler();
 }

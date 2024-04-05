@@ -41,6 +41,7 @@ vu8 DATA_SPEED[60] = {
 //----- Encoder Wheels-----
 #define Encoder_Wheel_Rear_Left (vs32)((num_over_t1 << 16) | TIM_GetCounter(TIM1)) / 100
 #define Encoder_Wheel_Rear_Right (vs32)((num_over_t2 << 16) | TIM_GetCounter(TIM2)) / 100
+#define Encoder_Wheel_Front (vs32)((num_over_t4 << 16) | TIM_GetCounter(TIM4)) / 100
 
 //----- 3 Lazers------
 #define Lazer_Right _ADC1_Value[6]
@@ -58,7 +59,7 @@ vu8 DATA_SPEED[60] = {
 #define Bien_Tro_Gripper _ADC1_Value[2]
 
 //----- Motor Hut -----
-#define Motor_Hut TIM4->CCR2
+#define Motor_Hut TIM8->CCR2
 
 //----- Xi Lanh Gripper: Off Tha Ra, On rut zo -----
 #define Xi_Lanh_Gripper_On GPIO_WriteBit(GPIOB, GPIO_Pin_15, 1)
@@ -92,7 +93,7 @@ vu8 DATA_SPEED[60] = {
 
 //----- encoder canh tay ------
 #define Encoder_Arm_X (vs32)((num_over_t5 << 16) | TIM_GetCounter(TIM5)) / 100
-#define Encoder_Arm_Y (vs32)((num_over_t3 << 16) | TIM_GetCounter(TIM3))/100
+#define Encoder_Arm_Y (vs32)((num_over_t3 << 16) | TIM_GetCounter(TIM3)) / 100
 
 //----- cam bien tu-----
 #define Cam_Bien_Tu_Arm_Y_Top GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_7)
@@ -106,7 +107,7 @@ vu8 DATA_SPEED[60] = {
 
 //-----
 #define Nut_1 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_13)
-#define Nut_2 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_1)
+#define Nut_2 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_6)
 #define Nut_3 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_14)
 #define Nut_4 GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_15)
 #define Nut_5 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_3)
@@ -124,11 +125,12 @@ vu16 _ADC1_Value[8];
 vu8 RX_USART1[15], RX_USART2[15];
 uint8_t MANG_GAME[10];
 extern unsigned char GP_BTN[15];
-int X_Thoi;
-int Y_Thoi;
 extern int _robotIMUAngle;
+int _lazerFront, _lazerLeft, _lazerRight;
 
 int k = 0, i = 0;
+
+int SanXanh = 1; // 1: Xanh 0: Do
 
 void Config_Out_Mode(void)
 {
@@ -136,12 +138,12 @@ void Config_Out_Mode(void)
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOC, ENABLE);
 
-	//	GPIO_InitStructure.GPIO_Pin = 0xffff;
-	//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	//	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	//	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	//	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	// GPIO_InitStructure.GPIO_Pin = 0xffff;
+	// GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	// GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	// GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	// GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	// GPIO_Init(GPIOA, &GPIO_InitStructure);
 
 	GPIO_InitStructure.GPIO_Pin = 0xffff;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -398,8 +400,8 @@ void Config_pwm_time_t9(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-	TIM_TimeBaseInitStructure.TIM_Prescaler = 0;
-	TIM_TimeBaseInitStructure.TIM_Period = 65535;
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 186;
+	TIM_TimeBaseInitStructure.TIM_Period = 10000;
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; //
 	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseInitStructure);

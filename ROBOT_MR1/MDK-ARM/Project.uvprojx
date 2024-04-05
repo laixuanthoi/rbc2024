@@ -478,6 +478,16 @@
               <FileType>5</FileType>
               <FilePath>.\Robot_Base.h</FilePath>
             </File>
+            <File>
+              <FileName>Arm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Arm.h</FilePath>
+            </File>
+            <File>
+              <FileName>WheelController.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\WheelController.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

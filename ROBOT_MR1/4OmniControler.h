@@ -608,7 +608,7 @@ float fHeSoChinhHuong = 0.1, f05 = 0.5, f1 = 1.0, f2 = 2.0, f4 = 4.0, f5 = 5.0, 
 int i100 = 100, khoangCachGocFix = 200;
 
 //------------ su dung cho ham gia toc bac 1 tuyen tinh--------------
-float _robotY = 40;
+float _robotY = 60;
 float _robotX = 100;
 
 int _lockRobot = 0;
