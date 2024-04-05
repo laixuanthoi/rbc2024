@@ -422,7 +422,7 @@ int getAngleGripper()
 }
 
 // === other ===
-void cartesianToPolar(int x, int y, float *r, float *theta)
+void cartersianToPolar(int x, int y, float *r, float *theta)
 {
     *r = sqrt(x * x + y * y);
     *theta = atan2(y, x) * (180.0 / PI);
@@ -440,7 +440,7 @@ bool moveArmToXY(int x, int y)
     float r, theta;
     int i = 0;
 
-    cartesianToPolar(x, y, &r, &theta);
+    cartersianToPolar(x, y, &r, &theta);
     theta = map_int(theta, 0, 180, 270, 90);
 
     if (!rotateBaseByAngle(theta, 50))
@@ -480,30 +480,25 @@ bool trackingBall()
 
     // 1. Move Arm To Top
     while (moveArmYByMilimet(10, 40))
-    {
         vTaskDelay(5);
-    }
     stopArmY();
 
     // 2. Move Arm To position 0 100
     while (moveArmToXY(0, 100))
-    {
         vTaskDelay(5);
-    }
     stopBase();
     stopArmX();
 
     // 3. Set gripper to 0 and Xilanh On
     while (rotateGripperByAngle(0, 50))
-    {
         vTaskDelay(5);
-    }
     stopGripper();
     Xi_Lanh_Gripper_Off;
-    Motor_Hut = 2000;
+
 reset_position:
     while (Nut_1)
         vTaskDelay(5);
+
     // move robot to 0 100
     while (moveArmToXY(0, 100))
         vTaskDelay(5);
@@ -541,37 +536,24 @@ reset_position:
         }
     }
 
-    //     while (Nut_1)
-    // {
-    //     vTaskDelay(5);
-    // }
-    // tracking ball
-
-    // while (1)
-    // {
-    //     vTaskDelay(10);
-    //     UART_ReceiveFromRaspberry(&xBall, &yBall);
-
-    //     if (xBall == -1 && yBall == -1) // neu ko thay bong
-    //         continue;
-
-    //     xBallDistance = map_int(xBall - 160, -160, 160, -100, 100);
-    //     yBallDistance = map_int(120 - yBall, -120, 120, -100, 100);
-
-    //     if (abs(xBallDistance) < 15 && abs(yBallDistance) < 15)
-    //     {
-    //         stopArmX();
-    //         stopBase();
-    //     }
-    //     else
-    //     {
-    //         armPosX += (int)xBallDistance / 10;
-    //         armPosY += (int)yBallDistance / 10;
-    //         moveArmToXY(armPosX, armPosY);
-    //     }
-    // }
-
     // loop forever
     while (1)
         vTaskDelay(5);
+}
+
+void robotRunToBall()
+{
+    while (moveArmYByMilimet(10, 50))
+        vTaskDelay(5);
+    stopArmY();
+
+    // move arm to XY
+    while (moveArmToXY(0, 100))
+        vTaskDelay(5);
+    stopArmX();
+    stopBase();
+
+    while (rotateGripperByAngle(60, 50))
+        vTaskDelay(5);
+    stopGripper();
 }

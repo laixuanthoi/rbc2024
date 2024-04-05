@@ -75,7 +75,7 @@ I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h)(0x660B6AE5)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x660B6AE5)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5EC7840C)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5EC7840C)
-F (..\main.c)(0x660EBD65)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\ADMIN\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\ADMIN\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\main.o --omf_browse .\project\main.crf --depend .\project\main.d)
+F (..\main.c)(0x660F84B7)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\ADMIN\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\ADMIN\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\main.o --omf_browse .\project\main.crf --depend .\project\main.d)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x660B6AE5)
 I (..\Libraries\CMSIS\Include\core_cm4.h)(0x660B6AE5)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5EC7840C)
@@ -128,22 +128,24 @@ I (..\LID_HMI.h)(0x660B6AE5)
 I (..\MDK-ARM\utils.h)(0x660C41E8)
 I (..\doc_tay_game.h)(0x660B6C77)
 I (..\4OmniControler.h)(0x660EB39F)
-I (..\MDK-ARM\Arm.h)(0x660EABA5)
-I (..\BasicFunction.h)(0x660EAF2D)
-I (..\ROBOTRUN.h)(0x660EC84E)
+I (..\MDK-ARM\Arm.h)(0x660F8516)
+I (..\BasicFunction.h)(0x660F72B3)
+I (..\ROBOTRUN.h)(0x660F7E0D)
+I (..\MDK-ARM\WheelController.h)(0x660F84E1)
 F (..\config.h)(0x660EB6BB)()
 F (..\doc_tay_game.h)(0x660B6C77)()
-F (..\BasicFunction.h)(0x660EAF2D)()
+F (..\BasicFunction.h)(0x660F72B3)()
 F (..\LID_HMI.h)(0x660B6AE5)()
 F (..\FreeRTOSConfig.h)(0x660B6AE5)()
 F (..\DieuKhienCoCau.h)(0x660B6AE5)()
-F (..\ROBOTRUN.h)(0x660EC84E)()
+F (..\ROBOTRUN.h)(0x660F7E0D)()
 F (..\4OmniControler.h)(0x660EB39F)()
 F (.\uart_comunicate.h)(0x660E1A63)()
 F (.\Robot_Arm.h)(0x660E6D32)()
 F (.\Time.h)(0x660B6AE5)()
 F (.\Robot_Base.h)(0x660C2AEA)()
-F (.\Arm.h)(0x660EABA5)()
+F (.\Arm.h)(0x660F8516)()
+F (.\WheelController.h)(0x660F84E1)()
 F (..\Libraries\STM32F4xx_StdPeriph_Driver\src\misc.c)(0x660B6AE5)(-c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -W -O3 --apcs=interwork -I ..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I ..\Libraries\STM32F4xx_StdPeriph_Driver\src -I ..\Libraries\CMSIS\Include -I ..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\include -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\MemMang -I ..\FreeRTOSV7.3.0\FreeRTOS\Source\portable\RVDS\ARM_CM4F -I ..\..\ROBOT_MR1 -I ..\MDK-ARM-I.\RTE\_Project-IC:\Users\ADMIN\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\ADMIN\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="531" -D_RTE_ -DSTM32F407xx -D_RTE_ -DSTM32F4XX -DUSE_STDPERIPH_DRIVER-o .\project\misc.o --omf_browse .\project\misc.crf --depend .\project\misc.d)
 I (..\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h)(0x660B6AE5)
 I (..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x660B6AE5)

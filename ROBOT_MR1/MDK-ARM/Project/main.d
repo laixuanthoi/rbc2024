@@ -55,3 +55,4 @@
 .\project\main.o: ..\MDK-ARM\Arm.h
 .\project\main.o: ..\BasicFunction.h
 .\project\main.o: ..\ROBOTRUN.h
+.\project\main.o: ..\MDK-ARM\WheelController.h

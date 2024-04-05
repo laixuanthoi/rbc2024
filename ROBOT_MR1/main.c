@@ -19,6 +19,7 @@
 #include "Arm.h"
 #include "BasicFunction.h"
 #include "ROBOTRUN.h"
+#include "WheelController.h"
 
 vs32 HMI_LOOP;
 
@@ -216,7 +217,7 @@ static void taskLCD(void *pvParameters)
 	}
 }
 
-static void taskUartComunicateWithRas(void *pvParameters)
+static void taskUartCommunicateWithRas(void *pvParameters)
 {
 	while (1)
 	{
@@ -285,7 +286,7 @@ static void taskMain(void *pvParameters)
 {
 	Config_Robot();
 
-	xTaskCreate(taskUartComunicateWithRas, (signed char *)"taskUartComunicateWithRas", 256, NULL, 0, NULL);
+	xTaskCreate(taskUartCommunicateWithRas, (signed char *)"taskUartCommunicateWithRas", 256, NULL, 0, NULL);
 	xTaskCreate(taskChongNhieuLazer, (signed char *)"taskChongNhieuLazer", 256, NULL, 0, NULL);
 	xTaskCreate(taskRobotAnalytics, (signed char *)"taskRobotAnalytics", 256, NULL, 0, NULL);
 	// reset encoder chay va imu
@@ -295,27 +296,27 @@ static void taskMain(void *pvParameters)
 	resetRobotArm();
 	resetBase();
 
-	while (moveArmYByMilimet(200, 50))
-	{
-		vTaskDelay(5);
-	}
-	stopArmY();
-	while (moveArmToXY(50, 100))
-	{
-		vTaskDelay(5);
-	}
-	stopArmX();
-	stopBase();
+	// while (moveArmYByMilimet(10, 50))
+	// 	vTaskDelay(5);
+	// stopArmY();
+
+	// // move arm to XY
+	// while (moveArmToXY(0, 100))
+	// 	vTaskDelay(5);
+	// stopArmX();
+	// stopBase();
+
+	// // while (rotateGripperByAngle(60, 50))
+	// // 	vTaskDelay(5);
+	// // stopGripper();
 
 	// trackingBall();
-
-	// Motor_Hut = 800;
+	robotRunToBall();
 	while (1)
 	{
-
 		if (!Nut_1)
 		{
-			runToSilo(2);
+			// runToSilo(2);
 			vTaskDelay(5);
 		}
 	}
