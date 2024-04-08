@@ -16,10 +16,11 @@
 #include "doc_tay_game.h"
 #include "4OmniControler.h"
 
-#include "Arm.h"
+
 #include "BasicFunction.h"
 #include "ROBOTRUN.h"
 #include "WheelController.h"
+#include "Arm.h"
 
 vs32 HMI_LOOP;
 
@@ -88,7 +89,7 @@ void HMI_TRAN(vs32 _so_dong)
 		break;
 	case 12:
 		yBall_Main = map_int(120 - yBall_Main, -120, 120, -160, 160);
-		HMI_DMI("X BALL:", yBall_Main, 12);
+		HMI_DMI("Y BALL:", yBall_Main, 12);
 		break;
 	case 13:
 		getArmPos2D(&armPosX, &armPosY);
@@ -311,14 +312,22 @@ static void taskMain(void *pvParameters)
 	// // stopGripper();
 
 	// trackingBall();
-	robotRunToBall();
+	//trackingBall();
 	while (1)
 	{
 		if (!Nut_1)
 		{
-			// runToSilo(2);
+			if(SanNe) startSanXanh();
+			else startSanDo();
 			vTaskDelay(5);
 		}
+		if (!Nut_2)
+		{
+			if(SanNe) restartXanh();
+			else restartDo();
+			vTaskDelay(5);
+		}
+		
 	}
 }
 int main(void)

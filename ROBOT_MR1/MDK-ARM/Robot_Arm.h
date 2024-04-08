@@ -38,7 +38,6 @@ struct ArmProperties
     int isReady;
 };
 
-struct ArmProperties armX;
 struct ArmProperties armY;
 int temp_x = 0;
 int temp_y = 100;
