@@ -1,5 +1,5 @@
 
-int listLazerSilo[5] = {60, 120, 120, 240, 300};
+
 
 void Bam_thanh_laser_phai(int speed, int AngleHead, int lazer_stable_phai, int num_change_stable)
 {
@@ -21,47 +21,89 @@ void Bam_thanh_laser_phai(int speed, int AngleHead, int lazer_stable_phai, int n
     else
         robotRunAngle(0, speed, AngleHead, 0.1);
 }
-
-// void Bam_thanh_laser_trai(int speed, int AngleHead, int lazer_stable_trai, int num_change_stable)
-// {
-//     int fix;
-
-//     fix = abs(_lazerRight - lazer_stable_trai) * 15;
-
-//     if (fix > 500)
-//         fix = 500;
-
-//     if (_lazerRight - lazer_stable_trai > num_change_stable)
-//     {
-//         robotRunAngle(0 + fix, speed, AngleHead, 0.1);
-//     }
-//     else if (lazeTraiValue - lazer_stable_trai < num_change_stable)
-//     {
-//         robotRunAngle(0 - fix, speed, AngleHead, 0.1);
-//     }
-//     else
-//         robotRunAngle(0, speed, AngleHead, 0.1);
-// }
-
-void runToSilo(int silo)
+void Bam_thanh_laser_phai_lui(int speed, int AngleHead, int lazer_stable_phai, int num_change_stable)
 {
-    int goc_temp = 0;
-    // xoay ve goc 0
-    while (abs(_robotIMUAngle) > 10)
+    int fix;
+
+    fix = abs(_lazerRight - lazer_stable_phai) * 15;
+
+    if (fix > 600)
+        fix = 600;
+
+    if (_lazerRight - lazer_stable_phai > num_change_stable)
     {
-        if (_robotIMUAngle > 0)
-            robotRotate(0, -0.5, 0);
-        else
-            robotRotate(0, 0.5, 0);
-        vTaskDelay(1);
+        robotRunAngle(1800 - fix, speed, AngleHead, 0.1);
     }
-    // robotRunAngle(0, 40, 0, 0.2);
-    for (i = 0; i < 50; i++)
-        while (_lazerFront > 20)
-        {
-            Bam_thanh_laser_phai(40, 0, listLazerSilo[silo], 3);
-            vTaskDelay(1);
-        }
+    else if (_lazerRight - lazer_stable_phai < num_change_stable)
+    {
+        robotRunAngle(1800 + fix, speed, AngleHead, 0.1);
+    }
+    else
+        robotRunAngle(1800, speed, AngleHead, 0.1);
+}
+
+void Bam_thanh_laser_trai(int speed, int AngleHead, int lazer_stable_trai, int num_change_stable)
+{
+    int fix;
+
+    fix = abs(_lazerLeft - lazer_stable_trai) * 15;
+
+    if (fix > 600)
+        fix = 600;
+
+    if (_lazerLeft - lazer_stable_trai > num_change_stable)
+    {
+        robotRunAngle(0 - fix, speed, AngleHead, 0.1);
+    }
+    else if (_lazerLeft - lazer_stable_trai < num_change_stable)
+    {
+        robotRunAngle(0 + fix, speed, AngleHead, 0.1);
+    }
+    else
+        robotRunAngle(0, speed, AngleHead, 0.1);
+}
+
+void Bam_thanh_laser_trai_lui(int speed, int AngleHead, int lazer_stable_trai, int num_change_stable)
+{
+    int fix;
+
+    fix = abs(_lazerLeft - lazer_stable_trai) * 15;
+
+    if (fix > 600)
+        fix = 600;
+
+    if (_lazerLeft - lazer_stable_trai > num_change_stable)
+    {
+        robotRunAngle(-1800 + fix, speed, AngleHead, 0.1);
+    }
+    else if (_lazerLeft - lazer_stable_trai < num_change_stable)
+    {
+        robotRunAngle(-1800 - fix, speed, AngleHead, 0.1);
+    }
+    else
+        robotRunAngle(1800, speed, AngleHead, 0.1);
+}
+
+
+// void runToSilo(int silo)
+// {
+//     int goc_temp = 0;
+//     // xoay ve goc 0
+//     while (abs(_robotIMUAngle) > 10)
+//     {
+//         if (_robotIMUAngle > 0)
+//             robotRotate(0, -0.5, 0);
+//         else
+//             robotRotate(0, 0.5, 0);
+//         vTaskDelay(1);
+//     }
+//     // robotRunAngle(0, 40, 0, 0.2);
+//     for (i = 0; i < 50; i++)
+//         while (_lazerFront > 20)
+//         {
+//             Bam_thanh_laser_phai(40, 0, listLazerSilo[silo], 3);
+//             vTaskDelay(1);
+//         }
 
     // for (i = 0; i < 50; i++)
     // {
@@ -92,69 +134,10 @@ void runToSilo(int silo)
     //             robotRunAngle(-900, 20, 0, -0.2);
     //     }
 
-    robotStop(0);
-}
+//     robotStop(0);
+// }
 
-void startSanXanh()
-{
-    RESET_ENCODER_WH();
-    robotRunAngle(900, 70, 0, 0.5);
 
-    for (i = 0; i < 50; i++)
-        while (getEncoderTong() < 3800)
-        {
-            vTaskDelay(1);
-        }
-    robotRunAngle(900, 50, 0, 0.5);
-    for (i = 0; i < 50; i++)
-        while (getEncoderTong() < 4200)
-        {
-            vTaskDelay(1);
-        }
-    robotRunAngle(900, 40, 0, 0.2);
-    for (i = 0; i < 50; i++)
-        while (_lazerRight > 50)
-        {
-            vTaskDelay(1);
-        }
-    RESET_ENCODER_WH();
-    robotRunAngle(0, 70, 0, 0.2);
-    for (i = 0; i < 50; i++)
-        while (getEncoderTong() < 2600)
-        {
-            vTaskDelay(1);
-        }
-    robotRunAngle(0, 40, 0, 0.2);
-    for (i = 0; i < 50; i++)
-        while (_lazerRight < 45)
-        {
-            vTaskDelay(1);
-        }
-    RESET_ENCODER_WH();
-    for (i = 0; i < 50; i++)
-        while (getEncoderTong() < 350)
-        {
-            vTaskDelay(1);
-        }
-    robotRunAngle(900, 50, 0, 0.2);
-    for (i = 0; i < 50; i++)
-        while (getEncoderTong() < 2200)
-        {
-            vTaskDelay(1);
-        }
-
-    for (i = 0; i < 50; i++)
-        while (_lazerRight > 180)
-        {
-            if (_lazerRight > 113)
-                robotRunAngle(850, 20, 0, 0.3);
-            else if (lazerTruocValue < 113)
-                robotRunAngle(950, 20, 0, 0.3);
-            else
-                robotRunAngle(900, 20, 0, 0.3);
-        }
-    robotStop(0);
-}
 
 // void startSanXanh()
 // {

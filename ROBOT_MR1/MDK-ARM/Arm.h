@@ -18,7 +18,7 @@
 #define MIN_ANGLE_BASE 0
 #define MAX_ANGLE_BASE 270
 #define MIN_BASE_MOTOR_SPEED 2
-#define MAX_BASE_MOTOR_SPEED 50
+#define MAX_BASE_MOTOR_SPEED 180
 
 // GRIPPER
 #define MIN_BIEN_TRO_GRIPPER 300
@@ -26,7 +26,7 @@
 #define MIN_ANGLE_GRIPPER 0
 #define MAX_ANGLE_GRIPPER 120
 #define MIN_GRIPPER_MOTOR_SPEED 2
-#define MAX_GRIPPER_MOTOR_SPEED 60
+#define MAX_GRIPPER_MOTOR_SPEED 90
 
 // MOTOR HUT
 #define MIN_MOTOR_HUT_SPEED 800
@@ -34,6 +34,12 @@
 
 #define IMAGE_WIDTH 320
 #define IMAGE_HEIGHT 240
+
+#define MY_PI 3.14159265358979323846
+
+int xBall = 0, yBall = 0;
+int checkBallgan = 3;
+
 
 // SEND uart --> Ras
 
@@ -47,10 +53,8 @@ void UART_SendToRaspberry()
     {
         USART_SendData(USART3, (uint8_t)1);
     }
-
     vTaskDelay(100);
 }
-
 // receive uart from ras
 void UART_ReceiveFromRaspberry(int *x, int *y)
 {
@@ -344,6 +348,7 @@ void resetRobotArm()
     int i;
     int motorSpeedX = 250;
     int motorSpeedY = 50;
+    Motor_Hut = 800;
     // == 1. reset Arm Y
     Motor_Arm_Y_Speed = motorSpeedY;
     Motor_Arm_Y_Direct_Up;
@@ -443,7 +448,7 @@ bool moveArmToXY(int x, int y)
     cartersianToPolar(x, y, &r, &theta);
     theta = map_int(theta, 0, 180, 270, 90);
 
-    if (!rotateBaseByAngle(theta, 50))
+    if (!rotateBaseByAngle(theta, 250))
     {
         i++;
         stopBase();
@@ -541,8 +546,234 @@ reset_position:
         vTaskDelay(5);
 }
 
+
+bool trackingBallBySon(){
+    int xBallDistance, yBallDistance;
+    float r, theta;
+    int realWidth = 300;
+    int realHeight = 300;
+
+    int armPosX, armPosY;
+    int i;
+
+    checkBallgan = 2;
+    // 1. Move Arm To Top
+    while (moveArmYByMilimet(10, 40))
+        vTaskDelay(5);
+    stopArmY();
+
+    // 2. Move Arm To position 0 100
+    while (moveArmToXY(0, 100))
+        vTaskDelay(5);
+    stopBase();
+    stopArmX();
+
+    // 3. Set gripper to 0 and Xilanh On
+    while (rotateGripperByAngle(0, 50))
+        vTaskDelay(5);
+    stopGripper();
+    Xi_Lanh_Gripper_Off;
+
+    vTaskDelay(2000);
+
+    // move robot to 0 100
+    while (moveArmToXY(0, 100))
+        vTaskDelay(5);
+    stopBase();
+    stopArmX();
+    vTaskDelay(3000);
+    while (1)
+    {
+        vTaskDelay(5);
+        UART_ReceiveFromRaspberry(&xBall, &yBall);
+        if (xBall == -1 || yBall == -1) // ko thay bong
+        {
+            stopBase();
+            stopArmX();
+            return true;
+        }
+
+        xBallDistance = map_int(xBall - 160, -160, 160, -160, 160);
+        yBallDistance = map_int(120 - yBall, -120, 120, -160, 160);
+
+        if (abs(xBallDistance) < 15 && abs(yBallDistance) < 15)
+        {
+            stopArmX();
+            stopBase();
+            return false;
+        }
+        else
+        {
+            getArmPos2D(&armPosX, &armPosY);
+            armPosX += (int)xBallDistance / 10;
+            armPosY += (int)yBallDistance / 10;
+            moveArmToXY(armPosX, armPosY);
+        }
+    }
+    return true;
+
+}
+
+
+
+bool robotRunByCamera(int xBall,int yBall,int speed){
+    int goc_temp = 0;
+    
+    if(yBall < -92) {
+        return false;
+    }
+    goc_temp = 1800 + (int)xBall*900/160;
+
+    if(goc_temp > 2400) goc_temp = 2400;
+    if(goc_temp < 1200) goc_temp = 1200;
+    robotRunAngle(goc_temp,speed,0,0.5);
+    return true;
+}
+
 void robotRunToBall()
 {
+    int xBallDistance,yBallDistance;
+    // while (moveArmYByMilimet(10, 50))
+    //     vTaskDelay(5);
+    // stopArmY();
+
+    // // move arm to XY
+    // while (moveArmToXY(0, 100))
+    //     vTaskDelay(5);
+    // stopArmX();
+    // stopBase();
+
+    // while (rotateGripperByAngle(40, 50))
+    //     vTaskDelay(5);
+    // stopGripper();
+    while(1){
+        delay_ms(200);
+        UART_ReceiveFromRaspberry(&xBall,&yBall);
+        xBallDistance = map_int(xBall - 160, -160, 160, -160, 160);
+        yBallDistance = map_int(120 - yBall, -120, 120, -160, 160);
+        
+        if(xBall == -1 || yBall == -1){ vTaskDelay(1000);continue;}
+        if(!robotRunByCamera(xBallDistance,yBallDistance,20)) {robotStop(0);break;}
+    }
+    robotStop(0);
+}
+
+
+
+void getBallFullXanh(int silo){
+    int listLazerSilo[5] = {20, 100, 170, 246, 320};
+    robotRunToBall();
+    RESET_ENCODER_WH();
+    robotStop(0);
+check_bong:
+    trackingBallBySon();
+    Motor_Hut = 2200;
+    Motor_Arm_Y_Direct_Down;
+    Motor_Arm_Y_Speed = 40;
+    for ( i = 0; i < 50; i++)
+    {
+       while (Cam_Bien_Tu_Arm_Y_Bottom)
+       {
+            vTaskDelay(1);
+       }
+       
+    }
+    stopArmY();
+    vTaskDelay(1000);
+    Xi_Lanh_Gripper_On;
+    vTaskDelay(3000);
+    while (moveArmYByMilimet(250, 50))
+		vTaskDelay(5);
+	stopArmY();
+    
+    while (moveArmYByMilimet(90, 50)){
+        if(!rotateGripperByAngle(110, 240)) stopGripper();
+        vTaskDelay(5);
+    }
+	stopArmY();
+    while (rotateGripperByAngle(110, 200))
+        vTaskDelay(5);
+    stopGripper();
+
+    if(Cam_Bien_Quang_Bong) {Motor_Hut = 800; goto check_bong;}
+    Motor_Hut = 800;
+    delay_ms(1500);
+    
+     while(moveArmXByMilimet(135, 250)){
+        vTaskDelay(1);
+    }
+    stopArmX();
+    Motor_Hut = 2200;
+    delay_ms(1500);
+    while(rotateBaseByAngle(0,120)){
+        vTaskDelay(1);
+    }
+    stopBase();
+    
+    Motor_Hut = 2000;
+    stopArmX();
+    robotStop(0);
+    stopArmY();
+
+    RESET_ENCODER_WH();
+    robotRunAngle(0,40,0,0.2);
+    for(i=0;i<50;i++) while (_lazerLeft < 400 ){
+        vTaskDelay(1);
+    }
+    robotStop(0);
+    delay_ms(1000);
+    for(i=0;i<50;i++) while (_lazerFront > 20){
+        Bam_thanh_laser_phai(20,0,listLazerSilo[silo],2);
+    }
+    robotStop(0);
+    for(i=0;i<50;i++) while(abs(_lazerRight - listLazerSilo[silo]) > 2){
+        if(_lazerRight > listLazerSilo[silo]) robotRunAngle(900,8,0,0.2);
+        else robotRunAngle(-900,8,0,0.2);
+    }
+    stopBase();
+    robotStop(0);
+    stopArmX();
+    stopArmY();
+    delay_ms(1000);
+    
+    Motor_Hut = 800;
+    Xi_Lanh_Gripper_Off;
+    vTaskDelay(1000);
+    checkBallgan = 3;
+
+
+}
+
+void runtoResetPointXanh(){
+     
+    int lazerFrontPoint = 190;
+    int lazerRightPoint = 170;
+    Xi_Lanh_Gripper_Off;
+    for ( i = 0; i < 50; i++) while (abs(_lazerFront - lazerFrontPoint) > 2)
+    {
+        if(_lazerFront > lazerFrontPoint) Bam_thanh_laser_phai(15,0,lazerRightPoint,2);
+        else Bam_thanh_laser_phai_lui(15,0,lazerRightPoint,2);
+
+        if(!moveArmYByMilimet(10, 50)) stopArmY();
+        if(!moveArmToXY(0, 100)) {stopArmX(); stopBase();}
+        if(!rotateGripperByAngle(40, 80)) stopGripper();
+
+        vTaskDelay(1);
+    }
+    for ( i = 0; i < 50; i++) while (abs(_lazerRight - lazerRightPoint) > 2){
+        if(_lazerRight > lazerRightPoint) robotRunAngle(900,20,0,0.2);
+        else robotRunAngle(-900,20,0,0.2);
+
+        if(!moveArmYByMilimet(10, 50)) stopArmY();
+        if(!moveArmToXY(0, 100)) {stopArmX(); stopBase();}
+        if(!rotateGripperByAngle(50, 50)) stopGripper();
+
+        vTaskDelay(1);
+    }
+    stopArmY();
+    stopBase();
+    stopArmX();
+    stopGripper();
     while (moveArmYByMilimet(10, 50))
         vTaskDelay(5);
     stopArmY();
@@ -553,7 +784,358 @@ void robotRunToBall()
     stopArmX();
     stopBase();
 
-    while (rotateGripperByAngle(60, 50))
+    while (rotateGripperByAngle(50, 50))
         vTaskDelay(5);
     stopGripper();
+    robotStop(0);
+    Xi_Lanh_Gripper_Off;   
+
+}
+
+
+void restartXanh(){
+    int k = 0;
+    robotRunAngle(450,40,0,0.2);
+    for ( i = 0; i < 50; i++) while (_lazerRight > 30)
+    {
+        vTaskDelay(1);
+    }
+    RESET_ENCODER_WH();
+    robotRunAngle(0,80,0,0.2);
+    for ( i = 0; i < 50; i++) while (getEncoderTong() < 2200)
+    {
+        vTaskDelay(1);
+    }
+    robotRunAngle(0,40,0,0.2);
+    for ( i = 0; i < 50; i++) while (_lazerRight < 40)
+    {
+        vTaskDelay(1);
+    }
+    RESET_ENCODER_WH();
+    for ( i = 0; i < 50; i++) while (getEncoderTong() < 400)
+    {
+        vTaskDelay(1);
+    }
+    robotRunAngle(900,50,0,0.2);
+    for ( i = 0; i < 50; i++) while (getEncoderTong() < 2200)
+    {
+        vTaskDelay(1);
+    }
+    while(1){
+        runtoResetPointXanh();
+        robotStop(0);
+        delay_ms(1000);
+        getBallFullXanh(getEncoderTong()%5);
+        robotStop(0);
+        vTaskDelay(1000);
+    }
+
+    
+
+}
+void startSanXanh()
+{
+    RESET_ENCODER_WH();
+    robotRunAngle(900, 70, 0, 0.5);
+
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 3800)
+        {
+            vTaskDelay(1);
+        }
+    robotRunAngle(900, 50, 0, 0.5);
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 4200)
+        {
+            vTaskDelay(1);
+        }
+    robotRunAngle(900, 40, 0, 0.2);
+    for (i = 0; i < 50; i++)
+        while (_lazerRight > 50)
+        {
+            vTaskDelay(1);
+        }
+    RESET_ENCODER_WH();
+    robotRunAngle(0, 70, 0, 0.2);
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 2600)
+        {
+            vTaskDelay(1);
+        }
+    robotRunAngle(0, 40, 0, 0.2);
+    for (i = 0; i < 50; i++)
+        while (_lazerRight < 45)
+        {
+            vTaskDelay(1);
+        }
+    RESET_ENCODER_WH();
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 350)
+        {
+            vTaskDelay(1);
+        }
+    robotRunAngle(900, 50, 0, 0.2);
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 2200)
+        {
+            vTaskDelay(1);
+        }
+
+    for (i = 0; i < 50; i++)
+        while (_lazerRight > 180)
+        {
+            if (_lazerRight > 113)
+                robotRunAngle(850, 20, 0, 0.3);
+            else if (lazerTruocValue < 113)
+                robotRunAngle(950, 20, 0, 0.3);
+            else
+                robotRunAngle(900, 20, 0, 0.3);
+        }
+    while(1){
+        runtoResetPointXanh();
+        robotStop(0);
+        delay_ms(1000);
+        getBallFullXanh(getEncoderTong()%5);
+        robotStop(0);
+        vTaskDelay(1000);
+    }
+
+}
+
+
+void getBallFullDo(int silo){
+    int listLazerSilo[5] = {20, 100, 170, 246, 320};
+    robotRunToBall();
+    RESET_ENCODER_WH();
+    robotStop(0);
+check_bong:
+    trackingBallBySon();
+    Motor_Hut = 2200;
+    Motor_Arm_Y_Direct_Down;
+    Motor_Arm_Y_Speed = 40;
+    for ( i = 0; i < 50; i++)
+    {
+       while (Cam_Bien_Tu_Arm_Y_Bottom)
+       {
+            vTaskDelay(1);
+       }
+       
+    }
+    stopArmY();
+    vTaskDelay(1000);
+    Xi_Lanh_Gripper_On;
+    vTaskDelay(3000);
+    while (moveArmYByMilimet(250, 50))
+		vTaskDelay(5);
+	stopArmY();
+    
+    while (moveArmYByMilimet(90, 50)){
+        if(!rotateGripperByAngle(110, 240)) stopGripper();
+        vTaskDelay(5);
+    }
+	stopArmY();
+    while (rotateGripperByAngle(110, 200))
+        vTaskDelay(5);
+    stopGripper();
+
+    if(Cam_Bien_Quang_Bong) {Motor_Hut = 800; goto check_bong;}
+    Motor_Hut = 800;
+    delay_ms(1500);
+    
+     while(moveArmXByMilimet(145, 250)){
+        vTaskDelay(1);
+    }
+    stopArmX();
+    Motor_Hut = 2200;
+    delay_ms(1500);
+    while(rotateBaseByAngle(0,120)){
+        vTaskDelay(1);
+    }
+    stopBase();
+    
+    Motor_Hut = 2000;
+    stopArmX();
+    robotStop(0);
+    stopArmY();
+
+    RESET_ENCODER_WH();
+    robotRunAngle(0,40,0,0.2);
+    for(i=0;i<50;i++) while (_lazerRight < 400 ){
+        vTaskDelay(1);
+    }
+    robotStop(0);
+    delay_ms(1000);
+    for(i=0;i<50;i++) while (_lazerFront > 20){
+        Bam_thanh_laser_trai(20,0,listLazerSilo[silo],2);
+    }
+    robotStop(0);
+    for(i=0;i<50;i++) while(abs(_lazerLeft - listLazerSilo[silo]) > 2){
+        if(_lazerLeft > listLazerSilo[silo]) robotRunAngle(-900,8,0,0.2);
+        else robotRunAngle(900,8,0,0.2);
+    }
+    stopBase();
+    robotStop(0);
+    stopArmX();
+    stopArmY();
+    delay_ms(1000);
+    
+    Motor_Hut = 800;
+    Xi_Lanh_Gripper_Off;
+    vTaskDelay(1000);
+    checkBallgan = 3;
+
+
+}
+
+
+
+void runtoResetPointDo(){
+     
+    int lazerFrontPoint = 190;
+    int lazerLeftPoint = 170;
+    Xi_Lanh_Gripper_Off;
+    for ( i = 0; i < 50; i++) while (abs(_lazerFront - lazerFrontPoint) > 2)
+    {
+        if(_lazerFront > lazerFrontPoint) Bam_thanh_laser_trai(15,0,lazerLeftPoint,2);
+        else Bam_thanh_laser_trai_lui(15,0,lazerLeftPoint,2);
+
+        if(!moveArmYByMilimet(10, 50)) stopArmY();
+        if(!moveArmToXY(0, 100)) {stopArmX(); stopBase();}
+        if(!rotateGripperByAngle(40, 80)) stopGripper();
+
+        vTaskDelay(1);
+    }
+    for ( i = 0; i < 50; i++) while (abs(_lazerLeft - lazerLeftPoint) > 2){
+        if(_lazerLeft > lazerLeftPoint) robotRunAngle(-900,20,0,0.2);
+        else robotRunAngle(900,20,0,0.2);
+
+        if(!moveArmYByMilimet(10, 50)) stopArmY();
+        if(!moveArmToXY(0, 100)) {stopArmX(); stopBase();}
+        if(!rotateGripperByAngle(50, 50)) stopGripper();
+
+        vTaskDelay(1);
+    }
+    stopArmY();
+    stopBase();
+    stopArmX();
+    stopGripper();
+    while (moveArmYByMilimet(10, 50))
+        vTaskDelay(5);
+    stopArmY();
+
+    // move arm to XY
+    while (moveArmToXY(0, 100))
+        vTaskDelay(5);
+    stopArmX();
+    stopBase();
+
+    while (rotateGripperByAngle(50, 50))
+        vTaskDelay(5);
+    stopGripper();
+    robotStop(0);
+    Xi_Lanh_Gripper_Off;   
+
+}
+
+void restartDo(){
+    int k = 0;
+    robotRunAngle(-450,40,0,0.2);
+    for ( i = 0; i < 50; i++) while (_lazerLeft > 30)
+    {
+        vTaskDelay(1);
+    }
+    RESET_ENCODER_WH();
+    robotRunAngle(0,80,0,0.2);
+    for ( i = 0; i < 50; i++) while (getEncoderTong() < 2200)
+    {
+        vTaskDelay(1);
+    }
+    robotRunAngle(0,40,0,0.2);
+    for ( i = 0; i < 50; i++) while (_lazerLeft < 40)
+    {
+        vTaskDelay(1);
+    }
+    RESET_ENCODER_WH();
+    for ( i = 0; i < 50; i++) while (getEncoderTong() < 400)
+    {
+        vTaskDelay(1);
+    }
+    robotRunAngle(-900,50,0,0.2);
+    for ( i = 0; i < 50; i++) while (getEncoderTong() < 2200)
+    {
+        vTaskDelay(1);
+    }
+    while(1){
+        runtoResetPointDo();
+        robotStop(0);
+        delay_ms(1000);
+        getBallFullDo(getEncoderTong()%5);
+        robotStop(0);
+        vTaskDelay(1000);
+    }
+
+    
+
+}
+
+
+void startSanDo(){
+    RESET_ENCODER_WH();
+    robotRunAngle(-900, 70, 0, 0.5);
+
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 3800)
+        {
+            vTaskDelay(1);
+        }
+    robotRunAngle(-900, 50, 0, 0.5);
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 4200)
+        {
+            vTaskDelay(1);
+        }
+    robotRunAngle(-900, 40, 0, 0.2);
+    for (i = 0; i < 50; i++)
+        while (_lazerLeft > 50)
+        {
+            vTaskDelay(1);
+        }
+    RESET_ENCODER_WH();
+    robotRunAngle(0, 70, 0, 0.2);
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 2600)
+        {
+            vTaskDelay(1);
+        }
+    robotRunAngle(0, 40, 0, 0.2);
+    for (i = 0; i < 50; i++)
+        while (_lazerLeft < 45)
+        {
+            vTaskDelay(1);
+        }
+    RESET_ENCODER_WH();
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 400)
+        {
+            vTaskDelay(1);  
+        }
+    
+    
+    robotRunAngle(-900, 50, 0, 0.2);
+    for (i = 0; i < 50; i++)
+        while (getEncoderTong() < 2200)
+        {
+            vTaskDelay(1);
+        }
+    robotStop(0);
+    while(1){
+        runtoResetPointDo();
+        robotStop(0);
+        delay_ms(1000);
+        getBallFullDo(getEncoderTong()%5);
+        robotStop(0);
+        vTaskDelay(1000);
+    }
+
+
 }

@@ -100,10 +100,14 @@ vu8 DATA_SPEED[60] = {
 #define Cam_Bien_Tu_Arm_Y_Bottom GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_10)
 #define Cam_Bien_Tu_Arm_X_In GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_12)
 
+//cam bien quang
+#define Cam_Bien_Quang_Bong GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_14)
+
 //----- NUT NHAN -----
 //----- Chuyen San -----
 #define Nut_San_Do GPIO_WriteBit(GPIOC, GPIO_Pin_15, 1)
 #define Nut_San_Xanh GPIO_WriteBit(GPIOC, GPIO_Pin_15, 0)
+#define	SanNe       GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1)
 
 //-----
 #define Nut_1 GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_13)
